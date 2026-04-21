@@ -1,0 +1,19 @@
+import { NextResponse } from "next/server";
+import { POOL_PG } from "@/lib/db";
+
+export async function GET() {
+  try {
+    const result = await POOL_PG.query("SELECT NOW()");
+
+    return NextResponse.json({
+      success: true,
+      time: result.rows[0]
+    });
+
+  } catch (error: any) {
+    return NextResponse.json({
+      success: false,
+      error: error.message
+    }, { status: 500 });
+  }
+}
