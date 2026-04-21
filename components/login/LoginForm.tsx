@@ -83,7 +83,7 @@ export default function LoginForm() {
   <div className="flex items-center ">
     <Image src="/whats.svg" alt="Logo PAN" width={60} height={60} />
 
-    <p className="text-3xl font-bold ">PAN</p>
+    <p className="text-3xl font-bold ">Conecta PAN</p>
   </div>
 
    {/* DIVIDER */}
@@ -177,7 +177,8 @@ export default function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl py-3.5 text-sm font-semibold text-white bg-gradient-to-r from-[#1B4F72] to-[#2E86AB] hover:opacity-90 transition disabled:opacity-60"
+            className="w-full rounded-xl py-3.5 text-sm 
+            font-semibold text-white bg-gradient-to-r from-[#1B4F72] to-[#2E86AB] hover:opacity-90 transition disabled:opacity-60"
           >
              {loading ? (
     <div className='flex justify-center items-center'><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div></div>
@@ -189,12 +190,10 @@ export default function LoginForm() {
   )}
           </button>
 
-<div className='flex justify-center'>
-  <p className='test-gray text-sm'>No tienes una cuenta? - Registrate</p>
-</div>
+
 
  {/* FOOTER */}
-  <div className="p-6 flex justify-center">
+  <div className=" flex justify-center">
     
    {/* Support contact */}
         <div className="relative z-10 flex flex-col items-center gap-0 ">
@@ -206,7 +205,8 @@ export default function LoginForm() {
               onClick={() => setShowSupport(!showSupport)}
               className="flex items-center gap-1.5 bg-transparent border-none cursor-pointer p-0 group"
             >
-              <span className="text-[10px] text-[#A0AABB] uppercase tracking-wider whitespace-nowrap group-hover:text-[#2E86AB] transition-colors duration-150">
+              <span className="text-[10px] text-gray-500 uppercase tracking-wider whitespace-nowrap
+               group-hover:text-[#2E86AB] transition-colors duration-150">
                 ¿Problemas para acceder?
               </span>
               <svg
@@ -218,7 +218,7 @@ export default function LoginForm() {
                 strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className={`text-[#A0AABB] group-hover:text-[#2E86AB] transition-all duration-250
+                className={`text-gray-500 group-hover:text-[#2E86AB] transition-all duration-250
                     ${showSupport ? 'rotate-180' : 'rotate-0'}`}
               >
                 <polyline points="6 9 12 15 18 9" />
