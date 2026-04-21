@@ -1,0 +1,38 @@
+name: Sync to QA Repo
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Push to QA repo
+        env:
+          QA_TOKEN: ${{ secrets.TOKEN_QA }}
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+
+          echo "Setting remote..."
+
+          git remote remove qa || true
+
+          git remote add qa https://x-access-token:${QA_TOKEN}@github.com/CESARBR2025/sjr-qa-conecta-pan.git
+
+          echo "Testing auth..."
+
+          git ls-remote https://x-access-token:${QA_TOKEN}@github.com/CESARBR2025/sjr-qa-conecta-pan.git
+
+          echo "Pushing..."
+
+          git push qa HEAD:main --force
