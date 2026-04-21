@@ -81,28 +81,29 @@ export default function LoginForm() {
 
   {/* LEFT */}
   <div className="flex items-center ">
-    <Image src="/whats.svg" alt="Logo PAN" width={60} height={60} />
+    <Image src="/whats.svg" alt="Logo PAN"  width={60} height={60}
+      className="w-[40px] h-[40px] sm:w-[60px] sm:h-[60px]" />
 
-    <p className="text-3xl font-bold ">Conecta PAN</p>
+    <p className="text-sm sm:text-2xl lg:text-3xl font-bold ">Conecta PAN</p>
   </div>
 
    {/* DIVIDER */}
   <div className="h-4 w-px bg-gray-300" />
 
   {/* RIGHT */}
-  <div className="text-2xl  text-gray ">
+  <div className="text-sm sm:text-xl lg:text-2xl  text-gray ">
     API Platform
   </div>
 
 </header>
 
   {/* CONTENT */}
-  <div className="flex-1 flex  justify-center px-4">
+  <div className="flex-1 flex  justify-center items-start pt-12 sm:pt-16 lg:pt-18  p-8 sm:px-4 lg:px-4 ">
 
     <div className="w-full max-w-md justify-center flex flex-col">
 
       {/* TITLE */}
-      <h1 className="text-3xl md:text-3xl lg:text-[30px]
+      <h1 className=" text-2xl  sm:text-[30px]
        text-center mb-12">
         Bienvenido
       </h1>
