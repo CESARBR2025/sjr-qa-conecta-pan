@@ -319,7 +319,7 @@ export default function LoginForm() {
 
   {/* 🟧 Shape principal (encima) */}
   <div
-    className="absolute top-[-100px] right-[-100px] w-[320px] h-[320px] bg-orange-400 opacity-90 z-20 shadow-2xl"
+    className="absolute top-[-80px] right-[-80px] w-[320px] h-[320px] bg-orange-400 opacity-90 z-20 shadow-2xl"
     style={{
       clipPath: "polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%)"
     }}
@@ -327,7 +327,7 @@ export default function LoginForm() {
 
   {/* 🔷 Shape secundario (abajo izquierda) */}
   <div
-    className="absolute bottom-[-120px] left-[-120px] w-[420px] h-[420px] bg-blue-300 opacity-60 z-0 blur-sm"
+    className="absolute bottom-[-150px] left-[-120px] w-[420px] h-[420px] bg-blue-300 opacity-60 z-0 blur-sm"
     style={{
       clipPath: "polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%)"
     }}
@@ -335,7 +335,7 @@ export default function LoginForm() {
 
   {/* 🔷 Shape pequeño decorativo */}
   <div
-    className="absolute bottom-[-120px] left-[-120px] w-[320px] h-[320px] bg-blue-400 opacity-70 z-30"
+    className="absolute bottom-[-100px] left-[-90px] w-[320px] h-[320px] bg-blue-400 opacity-70 z-30"
     style={{
       clipPath: "polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%)"
     }}
@@ -349,8 +349,7 @@ export default function LoginForm() {
     <span className="block">Conecta</span>
 
     <span className="block">
-      Afiliados  <span className="text-blue-500 mx-2">⌒</span>
-      
+      Afiliados <span className="text-blue-500 mx-2">⌒</span>
     </span>
 
     <span className="block">
