@@ -342,16 +342,25 @@ export default function LoginForm() {
   />
 
   {/* ✏️ Contenido */}
-  <div className="relative z-40 text-center px-10">
-    <h1 className="text-4xl xl:text-5xl font-bold text-gray-900 leading-tight">
-      Conecta 
-      <br />
-      Afiliados
-        <span className="text-blue-500 mx-2">⌒</span>
-      <br />
-      en Campaña<span className="text-orange-400">●</span>
-    </h1>
-  </div>
+  <div className="relative z-40 flex flex-col items-center justify-center text-center px-6 max-w-lg mx-auto">
+  
+  <h1 className="text-3xl sm:text-4xl xl:text-5xl font-bold text-gray-900 leading-tight space-y-2">
+    
+    <span className="block">Conecta</span>
+
+    <span className="block">
+      Afiliados  <span className="text-blue-500 mx-2">⌒</span>
+      
+    </span>
+
+    <span className="block">
+      en Campaña
+      <span className="text-orange-400 ml-1">●</span>
+    </span>
+
+  </h1>
+
+</div>
 
 </section>
     </main>
