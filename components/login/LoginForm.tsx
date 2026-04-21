@@ -99,7 +99,7 @@ export default function LoginForm() {
 </header>
 
   {/* CONTENT */}
-  <div className="flex-1 flex  justify-center items-start pt-10 sm:pt-16 lg:pt-8  p-8 sm:px-4 lg:px-4 ">
+  <div className="flex-1 flex  justify-center items-start pt-6 sm:pt-16 lg:pt-8  p-8 sm:px-4 lg:px-4 ">
 
     <div className="w-full max-w-md justify-center flex flex-col bg-white rounded-2xl shadow-md p-6 sm:p-8 border border-gray-100">
 
