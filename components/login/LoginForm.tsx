@@ -13,6 +13,7 @@ import {
   AlertCircle,
   Lock,
   Loader2,
+  UserRoundCheck,
 } from 'lucide-react';
 
 
@@ -134,7 +135,7 @@ export default function LoginForm() {
             </label>
 
             <div className="relative group">
-              <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A0AABB] group-focus-within:text-[#2E86AB]" size={16} />
+              <UserRoundCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A0AABB] group-focus-within:text-[#2E86AB]" size={16} />
 
               <input
                 type="text"
