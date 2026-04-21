@@ -72,46 +72,60 @@ export default function LoginForm() {
 
   return (
     <main
-      className="min-h-screen w-full flex bg-white">
+      className="h-screen w-full flex overflow-hidden">
   
-    <section className="flex-1 flex w-full flex flex-col">
+    <section className="flex-1 flex w-full flex flex-col overflow-hidden">
 
   {/* HEADER */}
- <header className="flex items-center gap-8 p-4">
+ <header className="flex items-center gap-4 p-4">
 
   {/* LEFT */}
   <div className="flex items-center ">
     <Image src="/whats.svg" alt="Logo PAN"  width={60} height={60}
-      className="w-[40px] h-[40px] sm:w-[60px] sm:h-[60px]" />
+      className="w-[30px] h-[30px] sm:w-[50px] sm:h-[50px]" />
 
-    <p className="text-sm sm:text-2xl lg:text-3xl font-bold ">Conecta PAN</p>
+    <p className="text-sm sm:text-xl lg:text-2xl font-bold ">Conecta PAN</p>
   </div>
 
    {/* DIVIDER */}
   <div className="h-4 w-px bg-gray-300" />
 
   {/* RIGHT */}
-  <div className="text-sm sm:text-xl lg:text-2xl  text-gray ">
+  <div className="text-sm sm:text-lg lg:text-xl  text-gray ">
     API Platform
   </div>
 
 </header>
 
   {/* CONTENT */}
-  <div className="flex-1 flex  justify-center items-start pt-12 sm:pt-16 lg:pt-18  p-8 sm:px-4 lg:px-4 ">
+  <div className="flex-1 flex  justify-center items-start pt-10 sm:pt-16 lg:pt-8  p-8 sm:px-4 lg:px-4 ">
 
-    <div className="w-full max-w-md justify-center flex flex-col">
+    <div className="w-full max-w-md justify-center flex flex-col bg-white rounded-2xl shadow-md p-6 sm:p-8 border border-gray-100">
 
-      {/* TITLE */}
-      <h1 className=" text-2xl  sm:text-[30px]
-       text-center mb-12">
-        Bienvenido
+<div className='flex flex-col  '>
+   {/* TITLE */}
+      <h1 className=" text-2xl font-bold text-[30px] sm:text-[40px]
+       text-center mb-6">
+        ¡Hola!
       </h1>
+
+     <h1 className=" text-2xl text-[18px] sm:text-[18px]
+       text-center mb-6">
+        Que bueno verte de nuevo
+      </h1>
+
+       <h1 className=" text-2xl text-[10px] sm:text-[12px]
+       text-center mb-8 tracking-normal">
+        Ingresa tus datos para iniciar sesión
+      </h1>
+</div>
+
+     
 
       {/* CARD */}
       
-
-        <form onSubmit={handleSubmit} className="space-y-10">
+<div className="w-full max-w-md flex flex-col justify-center">
+<form onSubmit={handleSubmit} className="space-y-10">
 
           {/* CURP */}
           <div>
@@ -277,6 +291,8 @@ export default function LoginForm() {
           
 
         </form>
+</div>
+        
       
     </div>
   </div>
@@ -288,7 +304,7 @@ export default function LoginForm() {
 
           {/* ─── Left panel ─── */}
      
-<div className="hidden lg:flex flex-1 relative items-center justify-center bg-[#F4F6FA] overflow-hidden">
+<section className="hidden lg:flex flex-1 relative items-center justify-center bg-[#F4F6FA] overflow-hidden ">
 
   {/* 🔷 Fondo grande (base) */}
   <div
@@ -336,7 +352,7 @@ export default function LoginForm() {
     </h1>
   </div>
 
-</div>
+</section>
     </main>
   );
 }
