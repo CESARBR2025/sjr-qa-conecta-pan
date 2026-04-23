@@ -1,34 +1,50 @@
+// ¿Qué hace paso a paso?
+
+// Extrae el token: Busca Authorization: Bearer {token} en los headers
+// Verifica el JWT: Decodifica y valida que el token sea válido
+// Consulta la BD: Busca al usuario y sus permisos
+// Adjunta el usuario: Añade req.user al request
+// Continúa: Retorna NextResponse.next() para pasar al siguiente middleware
+
+        
+// Posibles errores:
+
+// Sin token → 401
+// Token expirado/inválido → 401
+// Usuario no encontrado → 401      
 
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/jwt";
-import { POOL_PG as db } from "@/lib/db";
 
-export interface AuthenticatedRequest extends NextRequest {
-  user?: {
-    id: string;
-    email: string;
-    name: string;
-    roleId: number;
-    roleName: string;
-    permissions: string[];
-  };
-}
+import { AuthenticatedRequest } from "./middleware.types";
+import { UsersService } from "@/modules/login/services/login.service";
+
 
 export async function authMiddleware(request: NextRequest) {
+
+  const service = new UsersService()
+
+
+  
   try {
+    
     // 1. Extraer token del header
     const authHeader = request.headers.get("authorization");
-    if (!authHeader?.startsWith("Bearer ")) {
+
+
+    if (!authHeader ||  !authHeader?.startsWith("Bearer ")) {
       return NextResponse.json(
         { error: "No authorization token provided" },
         { status: 401 }
       );
     }
 
-    const token = authHeader.slice(7);
+  
+    const token = authHeader.slice(7); //Quitar el Bearer
 
-    // 2. Verificar y decodificar JWT
+    // 2. Verificar JWT
     const payload = verifyToken(token);
+
     if (!payload || !payload.userId) {
       return NextResponse.json(
         { error: "Invalid or expired token" },
@@ -36,44 +52,28 @@ export async function authMiddleware(request: NextRequest) {
       );
     }
 
-    // 3. Obtener usuario y permisos desde BD
-    const query = `
-      SELECT 
-        u.id,
-        u.email,
-        u.name,
-        u.role_id,
-        r.name as role_name,
-        ARRAY_AGG(p.name) as permissions
-      FROM users u
-      JOIN roles r ON u.role_id = r.id
-      LEFT JOIN role_permissions rp ON r.id = rp.role_id
-      LEFT JOIN permissions p ON rp.permission_id = p.id
-      WHERE u.id = $1 AND u.is_active = true
-      GROUP BY u.id, u.email, u.name, u.role_id, r.name
-    `;
+    //Obtener datos auth de usuario
+    const datosAuthUser = await service.svObtenerDatosUserAuth(payload?.userId)
 
-    const result = await db.query(query, [payload.userId]);
-
-    if (result.rows.length === 0) {
+    if(!datosAuthUser){
       return NextResponse.json(
-        { error: "User not found or inactive" },
-        { status: 401 }
-      );
+        {error: "User not found or inactive"},
+        {status: 401}
+      )
     }
-
-    const userRow = result.rows[0];
 
     // 4. Adjuntar usuario al request
     const authenticatedRequest = request as AuthenticatedRequest;
-    authenticatedRequest.user = {
-      id: userRow.id,
-      email: userRow.email,
-      name: userRow.name,
-      roleId: userRow.role_id,
-      roleName: userRow.role_name,
-      permissions: userRow.permissions.filter(Boolean) || [],
+      authenticatedRequest.user = {
+      id: datosAuthUser.id,
+      email: datosAuthUser.email,
+      name: datosAuthUser.name,
+      roleId: datosAuthUser.roleId,
+      roleName: datosAuthUser.roleName,
+      permissions: datosAuthUser.permissions.filter(Boolean) || [],
     };
+
+    //Retornar request modificado
 
     return NextResponse.next({
       request: authenticatedRequest,
@@ -87,7 +87,3 @@ export async function authMiddleware(request: NextRequest) {
   }
 }
 
-// Exportar middleware aplicable
-export const config = {
-  matcher: ["/api/:path*", "/(dashboard)/:path*"],
-};

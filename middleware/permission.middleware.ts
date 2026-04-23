@@ -1,64 +1,44 @@
+// ¿Qué hace paso a paso?
 
-import { NextRequest, NextResponse } from "next/server";
-import { AuthenticatedRequest } from "./auth.middleware";
+// Verifica que exista usuario: Si no hay req.user → 401
+// Comprueba permisos: Mira si el usuario tiene AL MENOS UNO de los permisos requeridos
+// Si falla: Retorna 403 Forbidden
+// Si pasa: Retorna null (significa: todo bien, continúa)
 
-export function requirePermission(...requiredPermissions: string[]) {
-  return (handler: Function) => {
-    return async (req: AuthenticatedRequest) => {
-      const user = req.user;
+import {  NextResponse } from "next/server";
+import { AuthenticatedRequest } from "./middleware.types";
 
-      if (!user) {
-        return NextResponse.json(
-          { error: "Authentication required" },
-          { status: 401 }
-        );
-      }
+export function permissionMiddleware(
+  requiredPermissions:  string[]
+) {
+  return async (request: AuthenticatedRequest) => {
+    // 1. Verificar que el usuario exista
+    const user = request.user;
 
-      // Verificar que usuario tiene al menos uno de los permisos requeridos
-      const hasPermission = requiredPermissions.some((perm) =>
-        user.permissions.includes(perm)
-      );
+    if(!user){
+      return NextResponse.json(
+        {error: "Authenteication required"},
+        {status: 401}
+      )
+    }
 
-      if (!hasPermission) {
-        return NextResponse.json(
-          {
-            error: "Insufficient permissions",
-            required: requiredPermissions,
-            have: user.permissions,
-          },
-          { status: 403 }
-        );
-      }
+    // 2. Verificar que tenga algun permiso requerido
+    const hasPermission = requiredPermissions.some((perm) => user.permissions.includes(perm))
 
-      return handler(req);
-    };
-  };
-}
+    if(!hasPermission){
+      return NextResponse.json(
+        {error: "Insufficient permission",
+          required: requiredPermissions,
+          userPermissions:  user.permissions
+        },
+        
+      )
+    }
 
-export function requireRole(...roles: string[]) {
-  return (handler: Function) => {
-    return async (req: AuthenticatedRequest) => {
-      const user = req.user;
+    // 3. Si tiene permisos continua
+    return null
 
-      if (!user) {
-        return NextResponse.json(
-          { error: "Authentication required" },
-          { status: 401 }
-        );
-      }
 
-      if (!roles.includes(user.roleName)) {
-        return NextResponse.json(
-          {
-            error: "Insufficient role",
-            required: roles,
-            have: user.roleName,
-          },
-          { status: 403 }
-        );
-      }
 
-      return handler(req);
-    };
-  };
+  }
 }

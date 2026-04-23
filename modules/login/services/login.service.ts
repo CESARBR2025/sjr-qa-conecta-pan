@@ -3,10 +3,19 @@
 import { UsersRepository } from '../repository/login.repository';
 import { DBUsers, ViewUsers } from '../types/login.types';
 import { mapBuscarUsuarioCus } from '../mappers/login.mappers';
+import { UserMiddleware } from '@/middleware/middleware.types';
 
 
 export class UsersService {
   private repo = new UsersRepository();
+
+  //Obtener datos auth de userr
+  async svObtenerDatosUserAuth(id: number): Promise<UserMiddleware> {
+    
+    return await this.repo.obtenerDatosUserAuthRP(id);
+    
+
+  }
 
   // Treaer datos de tabla ligera
   async svBuscarUsuarioCus(id: number): Promise<ViewUsers[]> {
