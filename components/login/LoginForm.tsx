@@ -56,9 +56,10 @@ export default function LoginForm() {
         return;
       }
 
+      console.log(data.user)
       //Guardar el token en local storage
       localStorage.setItem('token', data.token)
-      localStorage.setItem('user', data.user)
+      localStorage.setItem('user', JSON.stringify(data.user))
 
       //Redireccionar segun rol
       router.push(data.redirectTo)
@@ -130,11 +131,12 @@ export default function LoginForm() {
 
           {/* CURP */}
           <div>
-            <label className="text-xs  text-black uppercase   block">
-              CURP
-            </label>
+            <label className="ml-2 text-xs  font-semibold text-[#6B7A93] uppercase tracking-[0.12em]">
+                CURP
+              </label>
 
-            <div className="relative group">
+
+            <div className="relative group mt-2">
               <UserRoundCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A0AABB] group-focus-within:text-[#2E86AB]" size={16} />
 
               <input
@@ -152,7 +154,7 @@ export default function LoginForm() {
           {/* PASSWORD */}
           <div>
             <div className="flex justify-between mb-2">
-              <label className="text-[11px] font-semibold text-[#6B7A93] uppercase tracking-[0.12em]">
+              <label className="text-xs ml-2 font-semibold text-[#6B7A93] uppercase tracking-[0.12em]">
                 Contraseña
               </label>
 
@@ -193,8 +195,8 @@ export default function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl py-3.5 text-sm 
-            font-semibold text-white bg-gradient-to-r from-[#1B4F72] to-[#2E86AB] hover:opacity-90 transition disabled:opacity-60"
+            className="w-full rounded-xl py-3.5 
+            font-semibold text-md text-white bg-gradient-to-br from-[#1F69E7] to-[#3E83F0] flex items-center justify-center text-white font-bold  shadow-[0_3px_10px_rgba(31,105,231,0.3)] cursor-pointer hover:scale-102 transition-transform"
           >
              {loading ? (
     <div className='flex justify-center items-center'><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div></div>
@@ -305,7 +307,7 @@ export default function LoginForm() {
 
           {/* ─── Left panel ─── */}
      
-<section className="hidden lg:flex flex-1 relative items-center justify-center bg-[#F4F6FA] overflow-hidden ">
+<section className="hidden lg:flex flex-1 relative items-center justify-center bg-white overflow-hidden ">
 
   {/* 🔷 Fondo grande (base) */}
   <div

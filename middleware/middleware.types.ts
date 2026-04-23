@@ -5,12 +5,13 @@
 import { NextRequest } from "next/server"
 
 export interface UserMiddleware {
-    id: string
+    
     email: string
-    name: string
     roleId: number
     roleName: string
     permissions: string[]
+    userCus: number
+    
 }
 
 export interface AuthenticatedRequest extends NextRequest {

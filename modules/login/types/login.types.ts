@@ -13,13 +13,15 @@ export interface DBUsers {
   email: string
   password_hash: string
   role_id: number
+  rolename: string;
+  permissions: string[]
   is_active: boolean
   last_login: string
   created_at: string
   updated_at: string
   curp: string
   id_usuario_general: number;
-  nombres: string
+  nombre: string
   ap_paterno: string
   ap_materno: string
   
@@ -31,10 +33,12 @@ export interface DBUsers {
 
 //** Regreso de mapper */
 export interface ViewUsers {
-  idUser?: number;
+idUser?: number;
   email: string
   password_hash: string
   rolId: number
+  permissions: string[]
+  rolName: string;
   Isactivo: boolean
   ultimoAcceso: string
   creacion: string

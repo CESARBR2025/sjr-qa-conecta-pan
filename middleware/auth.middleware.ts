@@ -45,7 +45,7 @@ export async function authMiddleware(request: NextRequest) {
     // 2. Verificar JWT
     const payload = verifyToken(token);
 
-    if (!payload || !payload.userId) {
+    if (!payload || !payload.userCusId) {
       return NextResponse.json(
         { error: "Invalid or expired token" },
         { status: 401 }
@@ -53,7 +53,7 @@ export async function authMiddleware(request: NextRequest) {
     }
 
     //Obtener datos auth de usuario
-    const datosAuthUser = await service.svObtenerDatosUserAuth(payload?.userId)
+    const datosAuthUser = await service.svBuscarUsuarioCus(payload?.userCusId)
 
     if(!datosAuthUser){
       return NextResponse.json(
@@ -65,12 +65,14 @@ export async function authMiddleware(request: NextRequest) {
     // 4. Adjuntar usuario al request
     const authenticatedRequest = request as AuthenticatedRequest;
       authenticatedRequest.user = {
-      id: datosAuthUser.id,
+
       email: datosAuthUser.email,
-      name: datosAuthUser.name,
-      roleId: datosAuthUser.roleId,
-      roleName: datosAuthUser.roleName,
-      permissions: datosAuthUser.permissions.filter(Boolean) || [],
+      roleId: datosAuthUser.rolId,
+      permissions: datosAuthUser.permissions,
+      userCus: Number(datosAuthUser.idUsuarioCus),
+      roleName: datosAuthUser.rolName,
+  
+  
     };
 
     //Retornar request modificado

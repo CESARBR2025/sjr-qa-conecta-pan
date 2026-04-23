@@ -8,6 +8,7 @@ import {
   registrarUsuarioAction,
 } from "@/modules/login/services/login.server";
 import { ViewUsers } from "@/modules/login/types/login.types";
+import { UsersService } from "@/modules/login/services/login.service";
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
     let dataUser = await buscarUsuarioCusAction(id_usuario_general);
 
     // 4. Auto-registro si no existe localmente
-    if (dataUser.data.length === 0) {
+    if (!dataUser.data) {
       const cusInfo = await cusGetUserInfo(id_usuario_general).catch(() => {
         throw AuthErrors.CUS_UNAVAILABLE;
       });
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
       const nuevoUsuario: ViewUsers = {
         email: cus.email,
         password_hash: password,
-        rolId: 4,
+        rolId: 5,
         Isactivo: true,
         ultimoAcceso: new Date().toISOString(),
         creacion: new Date().toISOString(),
@@ -59,6 +60,9 @@ export async function POST(req: NextRequest) {
         nombres: cus.nombre,
         apPaterno: cus.primer_apellido?.trim() ?? "",
         apMaterno: cus.segundo_apellido?.trim() ?? "",
+        permissions: [''],
+        rolName: 'CIUDADANO'
+
       };
 
       //Registrar usuario
@@ -72,54 +76,23 @@ export async function POST(req: NextRequest) {
       dataUser = await buscarUsuarioCusAction(id_usuario_general);
     }
 
-    const usuario = dataUser.data[0];
+    const usuario = dataUser.data;
     console.log(usuario)
 
     if (!usuario) {
       throw AuthErrors.USER_NOT_FOUND; // asegúrate de tener este error en AuthErrors
     }
     
-
-    
-        // 3. Obtener usuario y permisos desde BD
-        const query = `
-          SELECT 
-            u.id,
-            u.email,
-            concat_ws(' ', u.nombre, u.ap_paterno, u.ap_materno) as nombre,
-            u.role_id,
-            r.name as role_name,
-            ARRAY_AGG(p.name) as permissions
-          FROM users u
-          JOIN roles r ON u.role_id = r.id
-          LEFT JOIN role_permissions rp ON r.id = rp.role_id
-          LEFT JOIN permissions p ON rp.permission_id = p.id
-          WHERE u.id_usuario_general = $1 AND u.is_active = true
-          GROUP BY u.id, u.email, u.nombre, u.role_id, r.name
-        `;
-    
-        const result = await db.query(query, [usuario.idUsuarioCus]);
-        
-    
-        if (result.rows.length === 0) {
-          return NextResponse.json(
-            { error: "User not found or inactive" },
-            { status: 401 }
-          );
-        }
-    
-        const userRow = result.rows[0];
-        console.log(userRow)
-    
-
-      // 5. Generar token JWT con info del usuario
+  // 5. Generar token JWT con info del usuario
     const token = generarJWT({
-    userId: usuario.idUsuarioCus,
+    userCusId: usuario.idUsuarioCus,
     roleId: usuario.rolId,
-    roleName: userRow.role_name,
-    permissions: userRow.permissions,
+    roleName: usuario.rolName,
+    permissions: usuario.permissions,
     curp: usuario.curp,
     nombres: usuario.nombres,
+    apPaterno: usuario.apPaterno,
+    apMaterno: usuario.apMaterno
   });
 
 
@@ -128,11 +101,14 @@ export async function POST(req: NextRequest) {
       4: "/admin",
       5: "/operator",
       6: "/recepcionista",
+      7: '/asignacion'
     };
 
-    const redirectTo = redirectMap[usuario.rolId] ?? "/dashboard";
+    const redirectTo = redirectMap[usuario.rolId] ?? "/asignacion";
 
     console.log(redirectTo)
+
+    console.log(usuario)
     
 
     return NextResponse.json(
@@ -144,6 +120,9 @@ export async function POST(req: NextRequest) {
           email: usuario.email,
           nombres: usuario.nombres,
           rolId: usuario.rolId,
+          rolName: usuario.rolName,
+          idCus: usuario.idUsuarioCus,
+          
         },
       },
       { status: 200 }

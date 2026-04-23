@@ -4,12 +4,14 @@ const JWT_SECRET = process.env.JWT_SECRET!;
 console.log(JWT_SECRET)
 
 export interface JwtPayload {
-  userId: number;
+  userCusId: number;
   roleId: number;
   roleName: string
   permissions: string[]
   curp: string;
   nombres: string;
+  apPaterno: string;
+  apMaterno: string;
   iat?: number;
   exp?: number;
 }
@@ -26,7 +28,7 @@ export function verifyToken(token: string): JwtPayload | null {
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
     // Validación mínima de estructura
-    if (!decoded || !decoded.userId) {
+    if (!decoded || !decoded.userCusId) {
       return null;
     }
 

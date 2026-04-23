@@ -11,7 +11,7 @@ type ActionReponse = { success: true } | { success: false; error: string };
 
 export type UsersResponse = {
   success: boolean;
-  data: ViewUsers[];
+  data: ViewUsers | null;
   error?: string;
 };
 
@@ -25,12 +25,12 @@ export async function buscarUsuarioCusAction(id: number): Promise<UsersResponse>
     };
   } catch (error) {
     if (error instanceof Error) {
-      return { success: false, data: [], error: error.message };
+      return { success: false, data: null , error: error.message };
     }
 
     return {
       success: false,
-      data: [],
+      data: null,
       error: 'Ocurrio error inesperado',
     };
   }

@@ -7,24 +7,15 @@ import { POOL_PG } from '@/lib/db';
 // ============================================================
 
 const SQL = {
-  OBTENER_DATOS_AUTH_USER: `
-   SELECT 
-        u.id,
-        u.email,
-        u.name,
-        u.role_id,
-        r.name as role_name,
-        ARRAY_AGG(p.name) as permissions
-      FROM users u
-      JOIN roles r ON u.role_id = r.id
-      LEFT JOIN role_permissions rp ON r.id = rp.role_id
-      LEFT JOIN permissions p ON rp.permission_id = p.id
-      WHERE u.id = $1 AND u.is_active = true
-      GROUP BY u.id, u.email, u.name, u.role_id, r.name
-  `
-,
+  
+
   BUSCAR_USUARIO_GENERAL: `
-    SELECT * FROM users WHERE id_usuario_general = $1
+    SELECT u.*, r.name as roleName, ARRAY_AGG(p.name) as permissions FROM users u 
+    join roles r on u.role_id  = r.id 
+    LEFT JOIN role_permissions rp ON r.id = rp.role_id
+      LEFT JOIN permissions p ON rp.permission_id = p.id
+      WHERE u.id_usuario_general = $1 AND u.is_active = true
+      GROUP BY u.id, u.email, u.nombre , u.role_id, r.name
   `,
   REGISTRAR_NUEVO_USUARIO: `
   INSERT INTO users 
@@ -43,27 +34,15 @@ const SQL = {
 
 export class UsersRepository {
 
-    async obtenerDatosUserAuthRP(id: number): Promise<UserMiddleware> {
-    console.log(id)
-    const res = await POOL_PG.query<UserMiddleware>(SQL.OBTENER_DATOS_AUTH_USER,[
-        id
-    ] );
+    
 
-     if (!res.rows.length) {
-    throw new Error("Usuario no encontrado");
-  }
-
-    return res.rows[0];
-  }
-
-
-  async buscarUsuarioGeneralRP(id: number): Promise<DBUsers[]> {
+  async buscarUsuarioGeneralRP(id: number): Promise<DBUsers> {
     console.log(id)
     const res = await POOL_PG.query<DBUsers>(SQL.BUSCAR_USUARIO_GENERAL,[
         id
     ] );
 
-    return res.rows;
+    return res.rows[0];
   }
 
   async  registrarNuevoUsuario(data: ViewUsers): Promise<void> {
