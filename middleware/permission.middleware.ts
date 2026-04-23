@@ -5,6 +5,15 @@
 // Si falla: Retorna 403 Forbidden
 // Si pasa: Retorna null (significa: todo bien, continúa)
 
+/**
+ * Ya tenemos middlewares de auth y permission
+ * Necesitamos acceder al crud de usuarios
+ * Necesitamos crear slidebar con pestania de Gestion de usuarios
+ * Teniendo eso ya podemos realizar rp y servicio para entrar a la vista
+ */
+
+
+
 import {  NextResponse } from "next/server";
 import { AuthenticatedRequest } from "./middleware.types";
 
