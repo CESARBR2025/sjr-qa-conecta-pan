@@ -1,13 +1,13 @@
 
 
-import { UsersRepository } from '../repository/login.repository';
+import { LoginRepository } from '../repository/login.repository';
 import { DBUsers, ViewUsers } from '../types/login.types';
 import { mapBuscarUsuarioCus } from '../mappers/login.mappers';
 import { UserMiddleware } from '@/middleware/middleware.types';
 
 
 export class UsersService {
-  private repo = new UsersRepository();
+  private repo = new LoginRepository();
 
   
 

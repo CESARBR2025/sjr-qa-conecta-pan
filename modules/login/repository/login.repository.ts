@@ -32,7 +32,7 @@ const SQL = {
 // REPOSITORIO
 // ============================================================
 
-export class UsersRepository {
+export class LoginRepository {
 
     
 
