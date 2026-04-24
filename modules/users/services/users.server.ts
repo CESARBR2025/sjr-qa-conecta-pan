@@ -1,11 +1,8 @@
-'use server';
+"use server";
 
-
-import { revalidatePath } from 'next/cache';
-import { ViewUsersAsigarRol } from '../types/users.types';
-import { UsersService } from './users.service';
-
-
+import { revalidatePath } from "next/cache";
+import { ViewUsersAsigarRol } from "../types/users.types";
+import { UsersService } from "./users.service";
 
 type ActionReponse = { success: true } | { success: false; error: string };
 
@@ -27,13 +24,13 @@ export async function listarUsuariosPendientesAction(): Promise<UsersResponse> {
     };
   } catch (error) {
     if (error instanceof Error) {
-      return { success: false, data: null , error: error.message };
+      return { success: false, data: null, error: error.message };
     }
 
     return {
       success: false,
       data: null,
-      error: 'Ocurrio error inesperado',
+      error: "Ocurrio error inesperado",
     };
   }
 }

@@ -12,42 +12,35 @@
  * Teniendo eso ya podemos realizar rp y servicio para entrar a la vista
  */
 
-
-
-import {  NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { AuthenticatedRequest } from "./middleware.types";
 
-export function permissionMiddleware(
-  requiredPermissions:  string[]
-) {
+export function permissionMiddleware(requiredPermissions: string[]) {
   return async (request: AuthenticatedRequest) => {
     // 1. Verificar que el usuario exista
     const user = request.user;
 
-    if(!user){
+    if (!user) {
       return NextResponse.json(
-        {error: "Authenteication required"},
-        {status: 401}
-      )
+        { error: "Authenteication required" },
+        { status: 401 },
+      );
     }
 
     // 2. Verificar que tenga algun permiso requerido
-    const hasPermission = requiredPermissions.some((perm) => user.permissions.includes(perm))
+    const hasPermission = requiredPermissions.some((perm) =>
+      user.permissions.includes(perm),
+    );
 
-    if(!hasPermission){
-      return NextResponse.json(
-        {error: "Insufficient permission",
-          required: requiredPermissions,
-          userPermissions:  user.permissions
-        },
-        
-      )
+    if (!hasPermission) {
+      return NextResponse.json({
+        error: "Insufficient permission",
+        required: requiredPermissions,
+        userPermissions: user.permissions,
+      });
     }
 
     // 3. Si tiene permisos continua
-    return null
-
-
-
-  }
+    return null;
+  };
 }

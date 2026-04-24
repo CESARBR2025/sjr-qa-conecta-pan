@@ -1,10 +1,8 @@
-'use server';
+"use server";
 
-
-import { revalidatePath } from 'next/cache';
-import { ViewRolesTable } from '../types/roles.types';
-import { RolesService } from './roles.service';
-
+import { revalidatePath } from "next/cache";
+import { ViewRolesTable } from "../types/roles.types";
+import { RolesService } from "./roles.service";
 
 type ActionReponse = { success: true } | { success: false; error: string };
 
@@ -26,45 +24,50 @@ export async function listarRolesAction(): Promise<RolesResponse> {
     };
   } catch (error) {
     if (error instanceof Error) {
-      return { success: false, data: null , error: error.message };
+      return { success: false, data: null, error: error.message };
     }
 
     return {
       success: false,
       data: null,
-      error: 'Ocurrio error inesperado',
+      error: "Ocurrio error inesperado",
     };
   }
 }
 
-
-  //Actualizar rol usuario nuevo
-  type ActualizarRolResponse = {
+//Actualizar rol usuario nuevo
+type ActualizarRolResponse = {
   success: boolean;
   data: any | null;
   error?: string;
 };
 
-export async function actualizarRolAction(idCus: number, idRol: number, userId: string): Promise<ActualizarRolResponse> {
+export async function actualizarRolAction(
+  idCus: number,
+  idRol: number,
+  userId: string,
+): Promise<ActualizarRolResponse> {
   const service = new RolesService();
-  console.log(userId)
+  console.log(userId);
   try {
-    const dataUsuario = await service.svActualizarRolUsuarioNuevo(idCus, idRol, userId);
+    const dataUsuario = await service.svActualizarRolUsuarioNuevo(
+      idCus,
+      idRol,
+      userId,
+    );
     return {
       success: true,
       data: dataUsuario,
     };
   } catch (error) {
     if (error instanceof Error) {
-      return { success: false, data: null , error: error.message };
+      return { success: false, data: null, error: error.message };
     }
 
     return {
       success: false,
       data: null,
-      error: 'Ocurrio error inesperado',
+      error: "Ocurrio error inesperado",
     };
   }
 }
-
-

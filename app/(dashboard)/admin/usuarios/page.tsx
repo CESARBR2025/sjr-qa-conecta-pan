@@ -1,10 +1,10 @@
 import Card from "@/components/ui/Card";
 
-export default function UsuariosPage()  {
-    return (
-        <div>
-        <h1>Hola usuarios page</h1>
-         {/* Card principal */}
+export default function UsuariosPage() {
+  return (
+    <div>
+      <h1>Hola usuarios page</h1>
+      {/* Card principal */}
       <Card>
         <h2 className="text-xl font-semibold mb-4">
           Card principal
@@ -25,6 +25,6 @@ export default function UsuariosPage()  {
           </p>
         </Card>
       </Card>
-        </div>
-    )
+    </div>
+  )
 }

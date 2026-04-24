@@ -43,36 +43,36 @@ export const AuthErrors = {
   MISSING_FIELDS: createError(
     "Debes ingresar tu CURP y contraseña",
     "MISSING_FIELDS",
-    400
+    400,
   ),
 
   INVALID_CREDENTIALS: createError(
     "La CURP o la contraseña no son correctas",
     "INVALID_CREDENTIALS",
-    401
+    401,
   ),
 
   USER_WITHOUT_ROLES: createError(
     "Tu cuenta no tiene permisos asignados. Contacta a soporte",
     "NO_ROLES",
-    403
+    403,
   ),
 
   USER_NOT_FOUND: createError(
     "El usuario no fue encontrado",
     "USER_NOT_FOUND",
-    404
+    404,
   ),
 
   CUS_UNAVAILABLE: createError(
     "El sistema no está disponible en este momento. Intenta más tarde",
     "CUS_DOWN",
-    503
+    503,
   ),
 
   REGISTRATION_FAILED: createError(
     "No se pudo completar el registro del usuario",
     "REGISTRATION_FAILED",
-    500
+    500,
   ),
 } as const;

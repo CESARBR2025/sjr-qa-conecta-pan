@@ -80,7 +80,7 @@ export default function ButtonComponent({
     `,
   };
 
-  const iconColor = variant === 'ghost' ? 'text-gray-500 font-semibold': 'text-current'
+  const iconColor = variant === 'ghost' ? 'text-gray-500 font-semibold' : 'text-current'
 
   return (
     <button
@@ -94,8 +94,8 @@ export default function ButtonComponent({
       `}
     >
       {loading && <Loader2 size={16} className="animate-spin" />}
-      
-      {!loading && Icon && <Icon size={18} className={iconColor} strokeWidth={2.5}/>}
+
+      {!loading && Icon && <Icon size={18} className={iconColor} strokeWidth={2.5} />}
 
       {children}
     </button>

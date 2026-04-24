@@ -1,13 +1,13 @@
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
-console.log(JWT_SECRET)
+console.log(JWT_SECRET);
 
 export interface JwtPayload {
   userCusId: number;
   roleId: number;
-  roleName: string
-  permissions: string[]
+  roleName: string;
+  permissions: string[];
   curp: string;
   nombres: string;
   apPaterno: string;

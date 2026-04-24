@@ -60,9 +60,8 @@ export async function POST(req: NextRequest) {
         nombres: cus.nombre,
         apPaterno: cus.primer_apellido?.trim() ?? "",
         apMaterno: cus.segundo_apellido?.trim() ?? "",
-        permissions: [''],
-        rolName: 'CIUDADANO'
-
+        permissions: [""],
+        rolName: "CIUDADANO",
       };
 
       //Registrar usuario
@@ -77,39 +76,37 @@ export async function POST(req: NextRequest) {
     }
 
     const usuario = dataUser.data;
-    console.log(usuario)
+    console.log(usuario);
 
     if (!usuario) {
       throw AuthErrors.USER_NOT_FOUND; // asegúrate de tener este error en AuthErrors
     }
-    
-  // 5. Generar token JWT con info del usuario
-    const token = generarJWT({
-    userCusId: usuario.idUsuarioCus,
-    roleId: usuario.rolId,
-    roleName: usuario.rolName,
-    permissions: usuario.permissions,
-    curp: usuario.curp,
-    nombres: usuario.nombres,
-    apPaterno: usuario.apPaterno,
-    apMaterno: usuario.apMaterno
-  });
 
+    // 5. Generar token JWT con info del usuario
+    const token = generarJWT({
+      userCusId: usuario.idUsuarioCus,
+      roleId: usuario.rolId,
+      roleName: usuario.rolName,
+      permissions: usuario.permissions,
+      curp: usuario.curp,
+      nombres: usuario.nombres,
+      apPaterno: usuario.apPaterno,
+      apMaterno: usuario.apMaterno,
+    });
 
     // 6. Determinar redirección según rol
     const redirectMap: Record<number, string> = {
       4: "/admin",
       5: "/operator",
       6: "/recepcionista",
-      7: '/asignacion'
+      7: "/asignacion",
     };
 
     const redirectTo = redirectMap[usuario.rolId] ?? "/asignacion";
 
-    console.log(redirectTo)
+    console.log(redirectTo);
 
-    console.log(usuario)
-    
+    console.log(usuario);
 
     return NextResponse.json(
       {
@@ -122,10 +119,9 @@ export async function POST(req: NextRequest) {
           rolId: usuario.rolId,
           rolName: usuario.rolName,
           idCus: usuario.idUsuarioCus,
-          
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     // Errores controlados (AuthErrors)
@@ -137,7 +133,7 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json(
         { ok: false, error: (error as { message: string }).message },
-        { status: (error as { status: number }).status }
+        { status: (error as { status: number }).status },
       );
     }
 
@@ -145,7 +141,7 @@ export async function POST(req: NextRequest) {
     console.error("[POST /api/login]", error);
     return NextResponse.json(
       { ok: false, error: "Error interno del servidor" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

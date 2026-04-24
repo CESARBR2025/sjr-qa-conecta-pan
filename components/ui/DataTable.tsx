@@ -80,20 +80,20 @@ function renderCell(column: ColumnInterface, row: any) {
 
   switch (column.type) {
     case "date":
-  return (
-    <span>
-      {value
-        ? new Date(value).toLocaleDateString("es-MX")
-        : "-"}
-    </span>
-  );
+      return (
+        <span>
+          {value
+            ? new Date(value).toLocaleDateString("es-MX")
+            : "-"}
+        </span>
+      );
     case "avatarName":
-       const avatarColor = getAvatarColor(value);
+      const avatarColor = getAvatarColor(value);
 
-  return (
-    <div className="flex items-center gap-3">
-      <div
-        className={`
+      return (
+        <div className="flex items-center gap-3">
+          <div
+            className={`
           w-10 h-10
           rounded-full
           flex items-center justify-center
@@ -101,84 +101,81 @@ function renderCell(column: ColumnInterface, row: any) {
           ${avatarColor.bg}
           ${avatarColor.text}
         `}
-      >
-        {getInitials(value)}
-      </div>
+          >
+            {getInitials(value)}
+          </div>
 
-      <span className="font-medium text-[#1A2340]">
-        {value}
-      </span>
-    </div>
-  );
+          <span className="font-medium text-[#1A2340]">
+            {value}
+          </span>
+        </div>
+      );
 
     case "status":
       return (
         <span
-  className={`
+          className={`
     inline-flex items-center gap-2
     px-3 py-1 rounded-lg text-sm font-medium
-    ${
-      value === "Activo"
-        ? "bg-[#EAF8F1] text-[#1F7A4D]"
-        : value === "Pendiente"
-        ? "bg-[#FEFAF1] text-[#FB933D] border border-[#FEF5E5]"
-        : "bg-[#FFF0F0] text-[#B54747]"
-    }
+    ${value === "Activo"
+              ? "bg-[#EAF8F1] text-[#1F7A4D]"
+              : value === "Pendiente"
+                ? "bg-[#FEFAF1] text-[#FB933D] border border-[#FEF5E5]"
+                : "bg-[#FFF0F0] text-[#B54747]"
+            }
   `}
->
-  {/* Puntito */}
-  <span
-    className={`
-      w-2 h-2 rounded-full
-      ${
-        value === "Activo"
-          ? "bg-[#1F7A4D]"
-          : value === "Pendiente"
-          ? "bg-[#FB933D]"
-          : "bg-[#B54747]"
-      }
-    `}
-  />
-
-  {value}
-</span>
-      );
-  
- case "actions":
-  return (
-    <div className="flex items-center gap-2">
-      {column.actions?.map((action, index) => {
-        const Icon =
-          action.variant === "delete"
-            ? Trash2
-            : action.variant === "edit"
-            ? PenLine
-            : Eye;
-
-        return (
-          <button
-            key={index}
-            onClick={() => action.onClick(row)}
+        >
+          {/* Puntito */}
+          <span
             className={`
+      w-2 h-2 rounded-full
+      ${value === "Activo"
+                ? "bg-[#1F7A4D]"
+                : value === "Pendiente"
+                  ? "bg-[#FB933D]"
+                  : "bg-[#B54747]"
+              }
+    `}
+          />
+
+          {value}
+        </span>
+      );
+
+    case "actions":
+      return (
+        <div className="flex items-center gap-2">
+          {column.actions?.map((action, index) => {
+            const Icon =
+              action.variant === "delete"
+                ? Trash2
+                : action.variant === "edit"
+                  ? PenLine
+                  : Eye;
+
+            return (
+              <button
+                key={index}
+                onClick={() => action.onClick(row)}
+                className={`
               inline-flex items-center gap-2
               px-3 py-2 rounded-lg text-sm font-medium transition
-              ${
-                action.variant === "delete"
-                  ? "bg-[#FEF4F6] text-[#DF4357] border-2 border-[#FCE2E7]"
-                  : action.variant === "edit"
-                  ? "bg-[#FEFEFE] text-[#1F69E7] border-2 border-[#ECF1FA]"
-                  : "bg-[#FFFAF3] text-[#FA9A44] border-2 border-[#FEECD9]"
-              }
+              ${action.variant === "delete"
+                    ? "bg-[#FEF4F6] text-[#DF4357] border-2 border-[#FCE2E7]"
+                    : action.variant === "edit"
+                      ? "bg-[#FEFEFE] text-[#1F69E7] border-2 border-[#ECF1FA]"
+                      : "bg-[#FFFAF3] text-[#FA9A44] border-2 border-[#FEECD9]"
+                  }
             `}
-          >
-            <Icon size={16} />
+              >
+                <Icon size={16} />
 
-            
-          </button>
-        );
-      })}
-    </div>
-  );
+
+              </button>
+            );
+          })}
+        </div>
+      );
 
 
     default:

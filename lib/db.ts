@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import { Pool } from "pg";
 
 declare global {
   // Evita duplicación en dev
@@ -16,6 +16,6 @@ export const POOL_PG =
     max: 10, // opcional pero recomendable
   });
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   global.pgPool = POOL_PG;
 }

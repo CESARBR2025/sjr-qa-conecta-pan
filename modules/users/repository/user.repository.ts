@@ -1,15 +1,17 @@
-import { UserMiddleware } from '@/middleware/middleware.types';
-import { DBUsersAsigarRol, DBUsersTable, ViewUsersAsigarRol } from '../types/users.types';
-import { ViewUsersTable } from '../types/users.types';
-import { POOL_PG } from '@/lib/db';
+import { UserMiddleware } from "@/middleware/middleware.types";
+import {
+  DBUsersAsigarRol,
+  DBUsersTable,
+  ViewUsersAsigarRol,
+} from "../types/users.types";
+import { ViewUsersTable } from "../types/users.types";
+import { POOL_PG } from "@/lib/db";
 
 // ============================================================
 // QUERIES SQL
 // ============================================================
 
 const SQL = {
-  
-
   LISTAR_USUARIOS_PENDIENTES: `
    select
 	u.id_usuario_general , concat_ws(' ', u.nombre , u.ap_paterno ) as nombre,
@@ -22,8 +24,6 @@ join users_status us on us.user_id = u.id
 join roles r on u.role_id  = r.id 
 where users_status = 'PENDIENTE'
   `,
-  
-
 } as const;
 
 // ============================================================
@@ -31,14 +31,11 @@ where users_status = 'PENDIENTE'
 // ============================================================
 
 export class UsersRepository {
-
-  
   async listarUsuariosPendientesRP(): Promise<DBUsersAsigarRol[]> {
-    
-    const res = await POOL_PG.query<DBUsersAsigarRol>(SQL.LISTAR_USUARIOS_PENDIENTES);
+    const res = await POOL_PG.query<DBUsersAsigarRol>(
+      SQL.LISTAR_USUARIOS_PENDIENTES,
+    );
 
     return res.rows;
   }
-
-
 }

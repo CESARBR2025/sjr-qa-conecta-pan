@@ -9,23 +9,16 @@
 //** Interfaz general tabla  */
 
 export interface DBRolesTable {
-  id: number
-  name: string
-  description: string
-  created_at: string
-  
+  id: number;
+  name: string;
+  description: string;
+  created_at: string;
 }
-
-
-
 
 // ════════════════════════════════════════════════════
 // TIPOS DE VISTA (LO QUE REGRESA EL MAPPER)
 // ════════════════════════════════════════════════════
 export interface ViewRolesTable {
-  idRol: number
-  nombreRol: string
-  
+  idRol: number;
+  nombreRol: string;
 }
-
-

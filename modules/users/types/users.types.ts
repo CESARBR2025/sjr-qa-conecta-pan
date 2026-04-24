@@ -10,33 +10,31 @@
 
 export interface DBUsersTable {
   id: number;
-  email: string
-  password_hash: string
-  role_id: number
+  email: string;
+  password_hash: string;
+  role_id: number;
   rolename: string;
-  permissions: string[]
-  is_active: boolean
-  last_login: string
-  created_at: string
-  updated_at: string
-  curp: string
+  permissions: string[];
+  is_active: boolean;
+  last_login: string;
+  created_at: string;
+  updated_at: string;
+  curp: string;
   id_usuario_general: number;
-  nombre: string
-  ap_paterno: string
-  ap_materno: string
-  
+  nombre: string;
+  ap_paterno: string;
+  ap_materno: string;
 }
-
 
 //Interfaz para usuarios con estatus pendiente
 export interface DBUsersAsigarRol {
   id_usuario_general: number;
-  nombre: string
-  curp: string
-  status: string
-  ultimo_acceso: string
-  rol_name: string
-  user_id: string
+  nombre: string;
+  curp: string;
+  status: string;
+  ultimo_acceso: string;
+  rol_name: string;
+  user_id: string;
 }
 
 // ════════════════════════════════════════════════════
@@ -44,31 +42,29 @@ export interface DBUsersAsigarRol {
 // ════════════════════════════════════════════════════
 export interface ViewUsersAsigarRol {
   idCus: number;
-  nombreUsuario: string
-  curp: string
-  status: string
-  ultimoAcceso: string
-  nombreRol: string
-  userId: string
+  nombreUsuario: string;
+  curp: string;
+  status: string;
+  ultimoAcceso: string;
+  nombreRol: string;
+  userId: string;
 }
-
-
 
 //** Regreso de mapper */
 export interface ViewUsersTable {
-idUser?: number;
-  email: string
-  password_hash: string
-  rolId: number
-  permissions: string[]
+  idUser?: number;
+  email: string;
+  password_hash: string;
+  rolId: number;
+  permissions: string[];
   rolName: string;
-  Isactivo: boolean
-  ultimoAcceso: string
-  creacion: string
-  actualizacion: string
-  curp: string
+  Isactivo: boolean;
+  ultimoAcceso: string;
+  creacion: string;
+  actualizacion: string;
+  curp: string;
   idUsuarioCus: number;
-  nombres: string
-  apPaterno: string
-  apMaterno: string
+  nombres: string;
+  apPaterno: string;
+  apMaterno: string;
 }

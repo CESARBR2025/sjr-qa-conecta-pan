@@ -6,7 +6,7 @@ interface UserData {
   email: string;
   rolId: number;
   nombres: string;
-  rolName: string
+  rolName: string;
 }
 // Traer datos de localStorage USER
 export function userAuthLocalStorage() {

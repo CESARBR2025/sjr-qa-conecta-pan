@@ -83,9 +83,9 @@ export default function AsignarRoleModal({
       setTimeout(() => {
         setShowNotification(false);
         onSucces();
-         handleClose();
+        handleClose();
       }, 2500);
-     
+
     } else {
       setLoadingSuccess(false);
       console.error(response.error);

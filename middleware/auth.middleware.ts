@@ -6,12 +6,11 @@
 // Adjunta el usuario: Añade req.user al request
 // Continúa: Retorna NextResponse.next() para pasar al siguiente middleware
 
-        
 // Posibles errores:
 
 // Sin token → 401
 // Token expirado/inválido → 401
-// Usuario no encontrado → 401      
+// Usuario no encontrado → 401
 
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/jwt";
@@ -19,27 +18,20 @@ import { verifyToken } from "@/lib/jwt";
 import { AuthenticatedRequest } from "./middleware.types";
 import { LoginService } from "@/modules/login/services/login.service";
 
-
 export async function authMiddleware(request: NextRequest) {
+  const service = new LoginService();
 
-  const service = new LoginService()
-
-
-  
   try {
-    
     // 1. Extraer token del header
     const authHeader = request.headers.get("authorization");
 
-
-    if (!authHeader ||  !authHeader?.startsWith("Bearer ")) {
+    if (!authHeader || !authHeader?.startsWith("Bearer ")) {
       return NextResponse.json(
         { error: "No authorization token provided" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
-  
     const token = authHeader.slice(7); //Quitar el Bearer
 
     // 2. Verificar JWT
@@ -48,31 +40,28 @@ export async function authMiddleware(request: NextRequest) {
     if (!payload || !payload.userCusId) {
       return NextResponse.json(
         { error: "Invalid or expired token" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     //Obtener datos auth de usuario
-    const datosAuthUser = await service.svBuscarUsuarioCus(payload?.userCusId)
+    const datosAuthUser = await service.svBuscarUsuarioCus(payload?.userCusId);
 
-    if(!datosAuthUser){
+    if (!datosAuthUser) {
       return NextResponse.json(
-        {error: "User not found or inactive"},
-        {status: 401}
-      )
+        { error: "User not found or inactive" },
+        { status: 401 },
+      );
     }
 
     // 4. Adjuntar usuario al request
     const authenticatedRequest = request as AuthenticatedRequest;
-      authenticatedRequest.user = {
-
+    authenticatedRequest.user = {
       email: datosAuthUser.email,
       roleId: datosAuthUser.rolId,
       permissions: datosAuthUser.permissions,
       userCus: Number(datosAuthUser.idUsuarioCus),
       roleName: datosAuthUser.rolName,
-  
-  
     };
 
     //Retornar request modificado
@@ -84,8 +73,7 @@ export async function authMiddleware(request: NextRequest) {
     console.error("Auth middleware error:", error);
     return NextResponse.json(
       { error: "Authentication failed" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 }
-

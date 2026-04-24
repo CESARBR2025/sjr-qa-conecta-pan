@@ -1,14 +1,12 @@
-import { UserMiddleware } from '@/middleware/middleware.types';
-import { DBUsers, ViewUsers } from '../types/login.types';
-import { POOL_PG } from '@/lib/db';
+import { UserMiddleware } from "@/middleware/middleware.types";
+import { DBUsers, ViewUsers } from "../types/login.types";
+import { POOL_PG } from "@/lib/db";
 
 // ============================================================
 // QUERIES SQL
 // ============================================================
 
 const SQL = {
-  
-
   BUSCAR_USUARIO_GENERAL: `
     SELECT u.*, r.name as roleName, ARRAY_AGG(p.name) as permissions FROM users u 
     join roles r on u.role_id  = r.id 
@@ -25,7 +23,7 @@ const SQL = {
    RETURNING *
   `,
 
-  REGISTRAR_NUEVO_USUARIO_USERS_STATUS : `
+  REGISTRAR_NUEVO_USUARIO_USERS_STATUS: `
    INSERT INTO users_status (
         user_id,
         status,
@@ -33,9 +31,7 @@ const SQL = {
         updated_at
       )
       VALUES ($1, $2, NOW(), NOW())
-  `
-
-
+  `,
 } as const;
 
 // ============================================================
@@ -43,66 +39,50 @@ const SQL = {
 // ============================================================
 
 export class LoginRepository {
-
-    
-
   async buscarUsuarioGeneralRP(id: number): Promise<DBUsers> {
-    console.log(id)
-    const res = await POOL_PG.query<DBUsers>(SQL.BUSCAR_USUARIO_GENERAL,[
-        id
-    ] );
+    console.log(id);
+    const res = await POOL_PG.query<DBUsers>(SQL.BUSCAR_USUARIO_GENERAL, [id]);
 
     return res.rows[0];
   }
 
-  async  registrarNuevoUsuario(data: ViewUsers): Promise<void> {
-    const client = await POOL_PG.connect()
+  async registrarNuevoUsuario(data: ViewUsers): Promise<void> {
+    const client = await POOL_PG.connect();
 
-    try{
-      await client.query("BEGIN")
+    try {
+      await client.query("BEGIN");
 
       // 1. Insert en usuarios para obtener el id
-      const userResult =  await client.query(
-        SQL.REGISTRAR_NUEVO_USUARIO,[
-           data.email,
-     data.password_hash,
-     data.rolId,
-     data.Isactivo,
-     data.ultimoAcceso,
-     data.creacion,
-     data.actualizacion,
-     data.curp,
-     data.idUsuarioCus,
-     data.nombres,
-     data.apPaterno,
-     data.apMaterno
-        ]
-      )
+      const userResult = await client.query(SQL.REGISTRAR_NUEVO_USUARIO, [
+        data.email,
+        data.password_hash,
+        data.rolId,
+        data.Isactivo,
+        data.ultimoAcceso,
+        data.creacion,
+        data.actualizacion,
+        data.curp,
+        data.idUsuarioCus,
+        data.nombres,
+        data.apPaterno,
+        data.apMaterno,
+      ]);
 
-      const userId = userResult.rows[0].id
-      console.log(userId)
+      const userId = userResult.rows[0].id;
+      console.log(userId);
 
       // 2. Insert en users_status
       const userResultDos = await client.query(
-        SQL.REGISTRAR_NUEVO_USUARIO_USERS_STATUS, [
-          userId,  'PENDIENTE'
-        ]
-      )
-      await client.query("COMMIT")
-
-    }catch (error){
-      await client.query("ROLLBACK")
-         console.log(error)
-      throw error
-   
+        SQL.REGISTRAR_NUEVO_USUARIO_USERS_STATUS,
+        [userId, "PENDIENTE"],
+      );
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      console.log(error);
+      throw error;
     } finally {
-      client.release()
+      client.release();
     }
-
-  
- 
   }
-
-  
-
 }
