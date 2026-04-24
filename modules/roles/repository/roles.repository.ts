@@ -50,8 +50,9 @@ export class RolesRepository {
   }
 
   
-    async  actualizarRolUsuarioNuevo(idCus: number, idRol: number): Promise<void> {
+    async  actualizarRolUsuarioNuevo(idCus: number, idRol: number, userId: string): Promise<void> {
       const client = await POOL_PG.connect()
+       console.log(userId)
   
       try{
         await client.query("BEGIN")
@@ -64,17 +65,11 @@ export class RolesRepository {
           ]
         )
 
-        console.log(userResult)
-
-        return
-  
-        const userId = userResult.rows[0].id
-        console.log(userId)
-  
+       
         // 2. Insert en users_status
         const userResultDos = await client.query(
-          SQL.REGISTRAR_NUEVO_USUARIO_USERS_STATUS, [
-            userId,  'PENDIENTE'
+          SQL.ACTUALIZAR_ROL_USUARIO_2, [
+            userId,  
           ]
         )
         await client.query("COMMIT")

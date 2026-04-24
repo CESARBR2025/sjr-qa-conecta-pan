@@ -36,6 +36,7 @@ export interface DBUsersAsigarRol {
   status: string
   ultimo_acceso: string
   rol_name: string
+  user_id: string
 }
 
 // ════════════════════════════════════════════════════
@@ -48,6 +49,7 @@ export interface ViewUsersAsigarRol {
   status: string
   ultimoAcceso: string
   nombreRol: string
+  userId: string
 }
 
 

@@ -12,7 +12,8 @@ export function mapUsersAsignarRol(row: DBUsersAsigarRol): ViewUsersAsigarRol {
   curp: row.curp,
   status: row.status,
   ultimoAcceso: row.ultimo_acceso,
-  nombreRol: row.rol_name
+  nombreRol: row.rol_name,
+  userId: row.user_id
     
   };
 }

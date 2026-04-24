@@ -14,11 +14,13 @@ const SQL = {
    select
 	u.id_usuario_general , concat_ws(' ', u.nombre , u.ap_paterno ) as nombre,
 	u.curp , us.status, u.last_login  as ultimo_acceso ,
-	r."name" as rol_name
+	r."name" as rol_name,
+  u.id as user_id
 	
 from users u
 join users_status us on us.user_id = u.id 
 join roles r on u.role_id  = r.id 
+where users_status = 'PENDIENTE'
   `,
   
 

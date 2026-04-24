@@ -17,9 +17,10 @@ export class RolesService {
 
 
    // Actualizar rol usuario nuevo
-  async svActualizarRolUsuarioNuevo(idCus: number, idRol: number): Promise<any> {
+  async svActualizarRolUsuarioNuevo(idCus: number, idRol: number, userId: string): Promise<any> {
     
-    const rows = await this.repo.actualizarRolUsuarioNuevo(idCus, idRol);
+    console.log(userId)
+    const rows = await this.repo.actualizarRolUsuarioNuevo(idCus, idRol, userId);
     
     return rows
   }

@@ -45,10 +45,11 @@ export async function listarRolesAction(): Promise<RolesResponse> {
   error?: string;
 };
 
-export async function actualizarRolAction(idCus: number, idRol: number): Promise<ActualizarRolResponse> {
+export async function actualizarRolAction(idCus: number, idRol: number, userId: string): Promise<ActualizarRolResponse> {
   const service = new RolesService();
+  console.log(userId)
   try {
-    const dataUsuario = await service.svActualizarRolUsuarioNuevo(idCus, idRol);
+    const dataUsuario = await service.svActualizarRolUsuarioNuevo(idCus, idRol, userId);
     return {
       success: true,
       data: dataUsuario,
