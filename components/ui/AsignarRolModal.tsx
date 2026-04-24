@@ -1,48 +1,99 @@
 "use client";
 
-import { useState } from "react";
+import { actualizarRolAction, listarRolesAction } from "@/modules/roles/service/roles.server";
+import { ViewRolesTable } from "@/modules/roles/types/roles.types";
+import { ViewUsersAsigarRol } from "@/modules/users/types/users.types";
+import { useEffect, useState } from "react";
 
-interface UserData {
-  nombre: string;
-  edad: number;
-}
+
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  initialData?: UserData;
-  onSave: (data: UserData) => void;
-  titleModal: string
-  descriptionModal: string
+  onSucces: () => void;
+  initialData: ViewUsersAsigarRol[]
 }
 
-export default function EditUserModal({
+export default  function AsignarRoleModal({
   isOpen,
   onClose,
+  onSucces,
   initialData,
-  onSave,
-  titleModal,
-  descriptionModal
+  
 }: Props) {
-  const [formData, setFormData] = useState<UserData>(
-    initialData ?? { nombre: "", edad: 0 }
-  );
+  
+  console.log(initialData)
 
+
+  const [roles, setRoles] = useState<ViewRolesTable[] >([])
+  const [loading, setLoading] = useState<boolean>(false)
+  const [loadinSuccess, setLoadingSucces] = useState<boolean>(false)
+  const [selectedRole, setSelectedRole] = useState<number | null>(null)
+  
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+  
+      const res = await listarRolesAction();
+      console.log(res)
+      if (res.success) {
+        console.log("entro")
+        setRoles(res.data ?? []);
+      }
+  
+      setLoading(false);
+    };
+  
+    load();
+  }, []);
+  
+  console.log(roles)
+
+
+ 
+
+  console.log(initialData[0].idCus)
+ const user = initialData[0]
+ console.log(user)
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave(formData);
-    onClose();
+  const  handleSubmit = async (e: React.FormEvent) => {
+e.preventDefault()
+
+    if (!selectedRole) return
+    setLoadingSucces(true)
+ 
+  const response = await actualizarRolAction(
+    initialData[0].idCus,
+    Number(selectedRole)
+  );
+
+   if (response.success) {
+    console.log("Rol actualizado correctamente");
+
+    // aquí luego puedes usar toast.success(...)
+    alert("Rol asignado exitosamente");
+
+    onSucces(); // refresca tabla padre
+    onClose();   // cierra modal
+  } else {
+    console.error(response.error);
+
+    // aquí luego puedes usar toast.error(...)
+    alert("Error al asignar rol");
+  }
+
   };
 
-  const initials = formData.nombre
-    .split(" ")
-    .map((w) => w[0])
+  
+  const initials = user.nombreUsuario
+    ?.split(" ")
+      .map((w: string) => w[0])
     .join("")
     .toUpperCase()
     .slice(0, 2);
 
+    
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/25 backdrop-blur-sm"
@@ -73,10 +124,10 @@ export default function EditUserModal({
             </div>
             <div>
               <h2 className="text-[18px] font-semibold text-[#1A2340] leading-snug">
-                {titleModal}
+                Asignar permisos
               </h2>
               <p className="text-[13px] text-[#8A96B0] mt-0.5">
-                {descriptionModal}
+                Asigna permisos a usuario
               </p>
             </div>
           </div>
@@ -110,10 +161,10 @@ export default function EditUserModal({
             </div>
             <div className="min-w-0">
               <p className="text-[13px] font-medium text-[#1A2340] truncate">
-                {formData.nombre || "Sin nombre"}
+                {user.nombreUsuario || "Sin nombre"}
               </p>
               <p className="text-[12px] text-[#B0BBCC]">
-                {formData.edad > 0 ? `${formData.edad} años` : "Edad no definida"}
+                {user.curp}
               </p>
             </div>
             <div className="ml-auto flex-shrink-0">
@@ -123,74 +174,48 @@ export default function EditUserModal({
             </div>
           </div>
 
-          {/* Campo Nombre */}
+          {/* Campo asignar rol */}
           <div className="space-y-1.5">
             <label className="block text-[12px] font-medium text-[#6B778C] tracking-wide">
-              Nombre completo
+              Selecciona el rol a asignar
             </label>
             <div className="relative">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
-                    stroke="#8A96B0"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                  <circle cx="12" cy="7" r="4" stroke="#8A96B0" strokeWidth="2" />
-                </svg>
-              </div>
-              <input
-                type="text"
-                value={formData.nombre}
-                onChange={(e) =>
-                  setFormData({ ...formData, nombre: e.target.value })
-                }
-                placeholder="Ej. Juan Pérez"
-                className="w-full h-[42px] pl-9 pr-4 rounded-[10px] border border-[#DDE3F0] text-[#1A2340] text-[14px] bg-white placeholder:text-[#8A96B0] focus:outline-none focus:border-[#1F69E7] focus:ring-4 focus:ring-[#1F69E7]/[0.08] transition-all"
-              />
-            </div>
+  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+        stroke="#8A96B0"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <circle
+        cx="12"
+        cy="7"
+        r="4"
+        stroke="#8A96B0"
+        strokeWidth="2"
+      />
+    </svg>
+  </div>
+
+  <select
+    value={selectedRole ?? ''}
+     onChange={(e) => setSelectedRole(Number(e.target.value))}
+    
+    className="w-full h-[42px] pl-9 pr-4 rounded-[10px] border border-[#DDE3F0] text-[#1A2340] text-[14px] bg-white focus:outline-none focus:border-[#1F69E7] focus:ring-4 focus:ring-[#1F69E7]/[0.08] transition-all appearance-none"
+  >
+    <option value="">Selecciona un rol</option>
+
+    {roles.map((rol) => (
+      <option key={rol.idRol} value={rol.idRol}>
+        {rol.nombreRol}
+      </option>
+    ))}
+  </select>
+</div>
           </div>
 
-          {/* Campo Edad */}
-          <div className="space-y-1.5">
-            <label className="block text-[12px] font-medium text-[#6B778C] tracking-wide">
-              Edad
-            </label>
-            <div className="relative">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <rect
-                    x="3"
-                    y="4"
-                    width="18"
-                    height="18"
-                    rx="2"
-                    stroke="#8A96B0"
-                    strokeWidth="2"
-                  />
-                  <path
-                    d="M16 2v4M8 2v4M3 10h18"
-                    stroke="#8A96B0"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </div>
-              <input
-                type="number"
-                value={formData.edad || ""}
-                onChange={(e) =>
-                  setFormData({ ...formData, edad: Number(e.target.value) })
-                }
-                placeholder="32"
-                min={0}
-                max={120}
-                className="w-full h-[42px] pl-9 pr-4 rounded-[10px] border border-[#DDE3F0] text-[#1A2340] text-[14px] bg-white placeholder:text-[#8A96B0] focus:outline-none focus:border-[#1F69E7] focus:ring-4 focus:ring-[#1F69E7]/[0.08] transition-all"
-              />
-            </div>
-          </div>
-
+       
           {/* Divider */}
           <div className="h-px bg-[#EAF1FC]" />
 

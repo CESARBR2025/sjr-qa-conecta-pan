@@ -27,9 +27,30 @@ export interface DBUsersTable {
   
 }
 
+
+//Interfaz para usuarios con estatus pendiente
+export interface DBUsersAsigarRol {
+  id_usuario_general: number;
+  nombre: string
+  curp: string
+  status: string
+  ultimo_acceso: string
+  rol_name: string
+}
+
 // ════════════════════════════════════════════════════
 // TIPOS DE VISTA (LO QUE REGRESA EL MAPPER)
 // ════════════════════════════════════════════════════
+export interface ViewUsersAsigarRol {
+  idCus: number;
+  nombreUsuario: string
+  curp: string
+  status: string
+  ultimoAcceso: string
+  nombreRol: string
+}
+
+
 
 //** Regreso de mapper */
 export interface ViewUsersTable {

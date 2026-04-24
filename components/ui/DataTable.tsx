@@ -6,7 +6,7 @@ import { ReactNode } from "react";
 export interface ColumnInterface {
   key: string;
   label: string;
-  type?: "text" | "avatarName" | "status" | "actions";
+  type?: "text" | "avatarName" | "status" | "actions" | "date";
   render?: (value: any, row: any) => ReactNode;
 
   actions?: {
@@ -79,6 +79,14 @@ function renderCell(column: ColumnInterface, row: any) {
   }
 
   switch (column.type) {
+    case "date":
+  return (
+    <span>
+      {value
+        ? new Date(value).toLocaleDateString("es-MX")
+        : "-"}
+    </span>
+  );
     case "avatarName":
        const avatarColor = getAvatarColor(value);
 

@@ -1,6 +1,6 @@
 'use server';
 
-import { UsersService } from './login.service';
+import { LoginService } from './login.service';
 import { revalidatePath } from 'next/cache';
 import { ViewUsers } from '../types/login.types';
 
@@ -16,7 +16,7 @@ export type UsersResponse = {
 };
 
 export async function buscarUsuarioCusAction(id: number): Promise<UsersResponse> {
-  const service = new UsersService();
+  const service = new LoginService();
   try {
     const dataUsuario = await service.svBuscarUsuarioCus(id);
     return {
@@ -39,7 +39,7 @@ export async function buscarUsuarioCusAction(id: number): Promise<UsersResponse>
 
 //Crear articulo
 export async function registrarUsuarioAction(data: ViewUsers): Promise<ActionReponse> {
-  const service = new UsersService();
+  const service = new LoginService();
 
   try {
     await service.svRegistrarNuevoUsuario(data);

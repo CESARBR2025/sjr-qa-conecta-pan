@@ -2,60 +2,78 @@
 import ButtonComponent from "@/components/ui/ButtonComponent";
 import Card from "@/components/ui/Card";
 import DataTable, {ColumnInterface } from "@/components/ui/DataTable";
-import EditUserModal from "@/components/ui/ModalDetalles";
+import AsignarRoleModal from "@/components/ui/AsignarRolModal";
+
+import { listarUsuariosPendientesAction } from "@/modules/users/services/users.server";
+import { UsersService } from "@/modules/users/services/users.service";
+import { ViewUsersAsigarRol } from "@/modules/users/types/users.types";
 import { Download, FunnelPlus, ListFilterPlus, Plus } from "lucide-react";
-import { useState } from "react";
+import { convertServerPatchToFullTree } from "next/dist/client/components/segment-cache/navigation";
+import { useEffect, useState } from "react";
 
 
-export default function UsuariosSolicitudesPage()  {
-    const [selectedAction, setSelectedAction] = useState("");
-    const [verDetalles, setVerDetalles] = useState<boolean>(false)
-
-
+export default   function UsuariosSolicitudesPage()  {
     
-const data = [
-  {
-    id: "#1001",
-    nombre: "Ana Martínez",
-    correo: "ana@empresa.com",
-    estado: "Pendiente",
-    ultimo_acceso: "21/05/2025 10:24"
+    const [verDetalles, setVerDetalles] = useState<boolean>(false)
+    const [data, setData] = useState<ViewUsersAsigarRol[]>([]);
+    const [loading, setLoading] = useState(true);
 
-  },
-  {
-    id: "#1002",
-    nombre: "Juan Rodríguez",
-    correo: "juan@empresa.com",
-    estado: "Pendiente",
-    ultimo_acceso: "21/05/2025 10:24"
-  },
-];
+
+const loadUsers = async () => {
+  setLoading(true);
+
+  const res = await listarUsuariosPendientesAction();
+
+  if (res.success) {
+    setData(res.data ?? []);
+  }
+
+  setLoading(false);
+};
+
+useEffect(() => {
+  loadUsers();
+}, []);
+
+console.log(data)
+
+
+
+if (loading) {
+  return <p>Cargando datos...</p>; // o un loader
+}
+    
 
 const columns: ColumnInterface[] = [
    {
-    key: "id",
+    key: "idCus",
     label: "ID-CUS",
     type: "text",
   },
     {
-    key: "nombre",
+    key: "nombreUsuario",
     label: "Nombre",
     type: "avatarName",
   },
   {
-    key: "correo",
-    label: "Correo",
+    key: "curp",
+    label: "CURP",
       type: "text",
     
   },
   {
-    key: "estado",
+    key: "status",
     label: "Estado",
     type: "status",
   },
     {
-    key: "ultimo_acceso",
+    key: "ultimoAcceso",
     label: "Ultimo acceso",
+    type: "date",
+  },
+   {
+    key: "nombreRol",
+    label: "Rol",
     type: "text",
   },
     {
@@ -70,14 +88,7 @@ const columns: ColumnInterface[] = [
              setVerDetalles(true);
         },
       },
-      {
-        label: "Eliminar",
-        variant: "delete",
-        onClick: (row) => {
-             setSelectedAction(`ACTION / ELIMINAR → ${row.nombre}`);
-          
-        },
-      },
+      
     ],
   },
  
@@ -134,18 +145,20 @@ const columns: ColumnInterface[] = [
                 {/* Card dentro de otra Card */}
 
                 {verDetalles && (
-                    <EditUserModal 
+                    <AsignarRoleModal 
                     isOpen={verDetalles}
           onClose={() => setVerDetalles(false)}
-          initialData={mockData || undefined} // Pasamos los datos actuales
-          onSave={handleSave} // Pasamos la función de guardado
-          titleModal="Asignar permiso"
-          descriptionModal="Actualiza la información personal."
+          onSucces={loadUsers}
+          initialData={data} // Pasamos los datos actuales
+          
+          
+          
           />
                 )}
                <DataTable  
                columns={columns}
-               data={data}/>
+               data={data ?? []}/>
+
               </Card>
         </div>
     )

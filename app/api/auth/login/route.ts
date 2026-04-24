@@ -8,7 +8,7 @@ import {
   registrarUsuarioAction,
 } from "@/modules/login/services/login.server";
 import { ViewUsers } from "@/modules/login/types/login.types";
-import { UsersService } from "@/modules/login/services/login.service";
+import { LoginService } from "@/modules/login/services/login.service";
 
 export async function POST(req: NextRequest) {
   try {
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       const nuevoUsuario: ViewUsers = {
         email: cus.email,
         password_hash: password,
-        rolId: 5,
+        rolId: 7,
         Isactivo: true,
         ultimoAcceso: new Date().toISOString(),
         creacion: new Date().toISOString(),

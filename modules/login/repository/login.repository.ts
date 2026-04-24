@@ -25,6 +25,16 @@ const SQL = {
    RETURNING *
   `,
 
+  REGISTRAR_NUEVO_USUARIO_USERS_STATUS : `
+   INSERT INTO users_status (
+        user_id,
+        status,
+        created_at,
+        updated_at
+      )
+      VALUES ($1, $2, NOW(), NOW())
+  `
+
 
 } as const;
 
@@ -46,9 +56,15 @@ export class LoginRepository {
   }
 
   async  registrarNuevoUsuario(data: ViewUsers): Promise<void> {
-    console.log(data)
- await POOL_PG.query(SQL.REGISTRAR_NUEVO_USUARIO, [
-     data.email,
+    const client = await POOL_PG.connect()
+
+    try{
+      await client.query("BEGIN")
+
+      // 1. Insert en usuarios para obtener el id
+      const userResult =  await client.query(
+        SQL.REGISTRAR_NUEVO_USUARIO,[
+           data.email,
      data.password_hash,
      data.rolId,
      data.Isactivo,
@@ -60,8 +76,31 @@ export class LoginRepository {
      data.nombres,
      data.apPaterno,
      data.apMaterno
-     
-    ]);
+        ]
+      )
+
+      const userId = userResult.rows[0].id
+      console.log(userId)
+
+      // 2. Insert en users_status
+      const userResultDos = await client.query(
+        SQL.REGISTRAR_NUEVO_USUARIO_USERS_STATUS, [
+          userId,  'PENDIENTE'
+        ]
+      )
+      await client.query("COMMIT")
+
+    }catch (error){
+      await client.query("ROLLBACK")
+         console.log(error)
+      throw error
+   
+    } finally {
+      client.release()
+    }
+
+  
+ 
   }
 
   

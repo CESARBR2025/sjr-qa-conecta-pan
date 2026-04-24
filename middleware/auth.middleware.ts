@@ -17,12 +17,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/jwt";
 
 import { AuthenticatedRequest } from "./middleware.types";
-import { UsersService } from "@/modules/login/services/login.service";
+import { LoginService } from "@/modules/login/services/login.service";
 
 
 export async function authMiddleware(request: NextRequest) {
 
-  const service = new UsersService()
+  const service = new LoginService()
 
 
   

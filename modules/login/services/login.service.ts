@@ -6,7 +6,7 @@ import { mapBuscarUsuarioCus } from '../mappers/login.mappers';
 import { UserMiddleware } from '@/middleware/middleware.types';
 
 
-export class UsersService {
+export class LoginService {
   private repo = new LoginRepository();
 
   
