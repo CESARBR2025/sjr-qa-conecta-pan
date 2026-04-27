@@ -41,7 +41,7 @@ function createError(message: string, code: string, status: number): AppError {
 
 export const AuthErrors = {
   MISSING_FIELDS: createError(
-    "Debes ingresar tu CURP y contraseña",
+    "Debes ingresar tu CORREO y contraseña",
     "MISSING_FIELDS",
     400,
   ),

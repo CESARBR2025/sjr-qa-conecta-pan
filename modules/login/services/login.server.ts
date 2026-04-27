@@ -1,9 +1,8 @@
-'use server';
+"use server";
 
-import { LoginService } from './login.service';
-import { revalidatePath } from 'next/cache';
-import { ViewUsers } from '../types/login.types';
-
+import { LoginService } from "./login.service";
+import { revalidatePath } from "next/cache";
+import { ViewUsers } from "../types/login.types";
 
 type ActionReponse = { success: true } | { success: false; error: string };
 
@@ -15,35 +14,38 @@ export type UsersResponse = {
   error?: string;
 };
 
-export async function buscarUsuarioCusAction(id: number): Promise<UsersResponse> {
+export async function buscarUsuarioCusAction(
+  correo: string,
+): Promise<UsersResponse> {
+  console.log(correo);
   const service = new LoginService();
   try {
-    const dataUsuario = await service.svBuscarUsuarioCus(id);
+    const dataUsuario = await service.svBuscarUsuarioCus(correo);
     return {
       success: true,
       data: dataUsuario,
     };
   } catch (error) {
     if (error instanceof Error) {
-      return { success: false, data: null , error: error.message };
+      return { success: false, data: null, error: error.message };
     }
 
     return {
       success: false,
       data: null,
-      error: 'Ocurrio error inesperado',
+      error: "Ocurrio error inesperado",
     };
   }
 }
 
-
 //Crear articulo
-export async function registrarUsuarioAction(data: ViewUsers): Promise<ActionReponse> {
+export async function registrarUsuarioAction(
+  data: ViewUsers,
+): Promise<ActionReponse> {
   const service = new LoginService();
 
   try {
     await service.svRegistrarNuevoUsuario(data);
-    
 
     return { success: true };
   } catch (error) {
@@ -53,7 +55,7 @@ export async function registrarUsuarioAction(data: ViewUsers): Promise<ActionRep
 
     return {
       success: false,
-      error: 'Ocurrio error inesperado',
+      error: "Ocurrio error inesperado",
     };
   }
 }

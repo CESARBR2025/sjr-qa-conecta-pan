@@ -21,7 +21,7 @@ import {
 export default function LoginForm() {
   const router = useRouter();
 
-  const [curp, setCurp] = useState('');
+  const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,13 +46,15 @@ export default function LoginForm() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ curp, password }),
+        body: JSON.stringify({ correo, password }),
         credentials: 'include', // 🔥 ESTO ES CLAVE
       });
       const data = await res.json();
+      console.log(data)
 
-      if (!res.ok) {
-        setError(data.message || 'Error al iniciar sesión');
+      if (!data.ok) {
+        console.log("entro")
+        setError(data.error || 'Error al iniciar sesión');
         return;
       }
 
@@ -122,21 +124,20 @@ export default function LoginForm() {
             <div className="w-full flex flex-col justify-center">
               <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8 lg:space-y-10">
 
-                {/* CURP */}
+                {/* EMAIL */}
                 <div>
                   <label className="ml-2 text-xs font-semibold text-[#6B7A93] uppercase tracking-[0.12em]">
-                    CURP
+                    Correo
                   </label>
 
                   <div className="relative group mt-2">
                     <UserRoundCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-[#A0AABB] group-focus-within:text-[#2E86AB]" size={16} />
                     <input
                       type="text"
-                      value={curp}
-                      onChange={(e) => setCurp(e.target.value.toUpperCase())}
-                      maxLength={18}
+                      value={correo}
+                      onChange={(e) => setCorreo(e.target.value)}
                       required
-                      placeholder="GOML850101HDFNZL02"
+                      placeholder="juanjose@gmail.com"
                       className="w-full rounded-xl border border-[#E4E8EF] bg-[#F8FAFC] py-3.5 pl-11 pr-4 text-sm outline-none focus:border-[#2E86AB] focus:bg-white focus:ring-4 focus:ring-[#2E86AB]/10 transition"
                     />
                   </div>

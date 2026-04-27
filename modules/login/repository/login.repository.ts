@@ -7,12 +7,12 @@ import { POOL_PG } from "@/lib/db";
 // ============================================================
 
 const SQL = {
-  BUSCAR_USUARIO_GENERAL: `
+  BUSCAR_USUARIO_EMAIL: `
     SELECT u.*, r.name as roleName, ARRAY_AGG(p.name) as permissions FROM users u 
     join roles r on u.role_id  = r.id 
     LEFT JOIN role_permissions rp ON r.id = rp.role_id
       LEFT JOIN permissions p ON rp.permission_id = p.id
-      WHERE u.id_usuario_general = $1 AND u.is_active = true
+      WHERE u.email = $1 AND u.is_active = true
       GROUP BY u.id, u.email, u.nombre , u.role_id, r.name
   `,
   REGISTRAR_NUEVO_USUARIO: `
@@ -39,9 +39,10 @@ const SQL = {
 // ============================================================
 
 export class LoginRepository {
-  async buscarUsuarioGeneralRP(id: number): Promise<DBUsers> {
-    console.log(id);
-    const res = await POOL_PG.query<DBUsers>(SQL.BUSCAR_USUARIO_GENERAL, [id]);
+  async buscarUsuarioGeneralRP(correo: string): Promise<DBUsers> {
+    const res = await POOL_PG.query<DBUsers>(SQL.BUSCAR_USUARIO_EMAIL, [
+      correo,
+    ]);
 
     return res.rows[0];
   }
