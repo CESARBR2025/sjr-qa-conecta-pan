@@ -22,7 +22,7 @@ const SQL = {
 from users u
 join users_status us on us.user_id = u.id 
 join roles r on u.role_id  = r.id 
-where users_status = 'PENDIENTE'
+where us.status = 'PENDIENTE'
   `,
 } as const;
 

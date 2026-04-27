@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { generarJWT } from "@/lib/jwt";
 import { AuthErrors } from "@/lib/errors";
 import { cusGetUserInfo, cusLogin } from "@/lib/cus";
+import { enviarCorreoAuth } from "@/modules/email/service/mailer.server";
 import { POOL_PG as db } from "@/lib/db";
 import {
   buscarUsuarioCusAction,
@@ -107,6 +108,10 @@ export async function POST(req: NextRequest) {
     console.log(redirectTo);
 
     console.log(usuario);
+
+    //Enviar correo de notificacion
+    await enviarCorreoAuth();
+    console.log("paso");
 
     return NextResponse.json(
       {

@@ -64,8 +64,8 @@ const grouped = navItems.reduce<Record<string, typeof navItems>>(
   {}
 );
 
-// ─── Bottom tab items (móvil) ─────────────────────────────────────────────────
-const bottomTabItems = navItems.filter((i) => !i.children && i.href);
+// ─── Bottom tab items (móvil): todos los items principales ───────────────────
+const bottomTabItems = navItems.filter((i) => i.group === "Principal");
 
 // ─── Componente interno: NavItem ──────────────────────────────────────────────
 function NavItem({
@@ -240,17 +240,23 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { user } = userAuthLocalStorage();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [popoverItem, setPopoverItem] = useState<string | null>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
 
   // Cerrar al cambiar de ruta
   useEffect(() => {
     setMobileOpen(false);
+    setPopoverItem(null);
   }, [pathname]);
 
   // Cerrar con Escape
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMobileOpen(false);
+      if (e.key === "Escape") {
+        setMobileOpen(false);
+        setPopoverItem(null);
+      }
     };
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
@@ -411,35 +417,127 @@ export default function Sidebar() {
           </div>
         </div>
 
+        {/* Popover overlay (cierra al tocar fuera) */}
+        {popoverItem && (
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setPopoverItem(null)}
+            aria-hidden="true"
+          />
+        )}
+
         {/* Bottom nav bar (accesos rápidos) */}
         <nav className="fixed bottom-0 left-0 right-0 z-40 h-16 bg-white border-t border-blue-50 shadow-[0_-2px_12px_rgba(31,105,231,0.08)] flex items-center justify-around px-2">
           {bottomTabItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href;
+            const hasChildren = (item.children ?? []).length > 0;
+            const isActive = item.href
+              ? pathname === item.href
+              : item.children?.some((c) => pathname.startsWith(c.href));
+            const isPopoverOpen = popoverItem === item.label;
+
             return (
-              <Link
-                key={item.href}
-                href={item.href!}
-                className={`
-                  flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-200
-                  ${isActive ? "text-[#1F69E7]" : "text-[#8A96B0]"}
-                `}
-              >
-                <span
-                  className={`
-                    w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-200
-                    ${isActive ? "bg-[#EFF4FE]" : ""}
-                  `}
-                >
-                  <Icon
-                    className={`w-5 h-5 transition-all ${isActive ? "stroke-[#1F69E7]" : ""}`}
-                    strokeWidth={isActive ? 2.5 : 2}
-                  />
-                </span>
-                <span className="text-[10px] font-semibold leading-none">
-                  {item.label}
-                </span>
-              </Link>
+              <div key={item.label} className="relative flex flex-col items-center">
+                {/* Popover hacia arriba */}
+                {hasChildren && isPopoverOpen && (
+                  <div
+                    ref={popoverRef}
+                    className="absolute bottom-[calc(100%+10px)] left-1/2 -translate-x-1/2 z-50
+                      bg-white rounded-2xl shadow-[0_8px_32px_rgba(31,105,231,0.18)]
+                      border border-[#DDE3F0] overflow-hidden min-w-[160px]
+                      animate-[popoverIn_0.18s_ease_out_both]"
+                    style={{
+                      // Si el ítem está en el borde izquierdo, ajustar
+                    }}
+                  >
+                    {/* Flecha del popover */}
+                    <div className="absolute -bottom-[6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-r border-b border-[#DDE3F0] rotate-45" />
+
+                    {/* Título del grupo */}
+                    <div className="px-4 pt-3 pb-1">
+                      <p className="text-[10px] font-bold uppercase tracking-[1.5px] text-[#B0BBCC]">
+                        {item.label}
+                      </p>
+                    </div>
+
+                    {/* Subítems */}
+                    <div className="px-2 pb-2 space-y-0.5">
+                      {item.children!.map((child) => {
+                        const isChildActive = pathname === child.href;
+                        const ChildIcon = child.icon;
+                        return (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            onClick={() => setPopoverItem(null)}
+                            className={`
+                              flex items-center gap-2.5 px-3 py-2.5 rounded-xl
+                              font-medium text-sm transition-all duration-150
+                              ${isChildActive
+                                ? "bg-gradient-to-r from-[#1F69E7] to-[#3E83F0] text-white shadow-[0_4px_14px_rgba(31,105,231,0.3)]"
+                                : "text-[#6B778C] hover:bg-[#EFF4FE] hover:text-[#1F69E7]"
+                              }
+                            `}
+                          >
+                            <ChildIcon className="w-4 h-4 flex-shrink-0" strokeWidth={2.2} />
+                            <span>{child.label}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Botón del tab */}
+                {hasChildren ? (
+                  <button
+                    type="button"
+                    onClick={() => setPopoverItem(isPopoverOpen ? null : item.label)}
+                    className={`
+                      flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-200
+                      ${isActive || isPopoverOpen ? "text-[#1F69E7]" : "text-[#8A96B0]"}
+                    `}
+                  >
+                    <span
+                      className={`
+                        w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-200
+                        ${isActive || isPopoverOpen ? "bg-[#EFF4FE]" : ""}
+                      `}
+                    >
+                      <Icon
+                        className="w-5 h-5 transition-all"
+                        strokeWidth={isActive || isPopoverOpen ? 2.5 : 2}
+                      />
+                    </span>
+                    <span className="text-[10px] font-semibold leading-none">
+                      {item.label}
+                    </span>
+                  </button>
+                ) : (
+                  <Link
+                    href={item.href!}
+                    className={`
+                      flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-200
+                      ${isActive ? "text-[#1F69E7]" : "text-[#8A96B0]"}
+                    `}
+                  >
+                    <span
+                      className={`
+                        w-8 h-8 flex items-center justify-center rounded-xl transition-all duration-200
+                        ${isActive ? "bg-[#EFF4FE]" : ""}
+                      `}
+                    >
+                      <Icon
+                        className="w-5 h-5 transition-all"
+                        strokeWidth={isActive ? 2.5 : 2}
+                      />
+                    </span>
+                    <span className="text-[10px] font-semibold leading-none">
+                      {item.label}
+                    </span>
+                  </Link>
+                )}
+              </div>
             );
           })}
 
@@ -455,6 +553,14 @@ export default function Sidebar() {
             <span className="text-[10px] font-semibold leading-none">Más</span>
           </button>
         </nav>
+
+        {/* Keyframe para la animación del popover */}
+        <style>{`
+          @keyframes popoverIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(6px) scale(0.96); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0)   scale(1); }
+          }
+        `}</style>
 
         {/* Spacer para que el contenido no quede debajo del top/bottom bar */}
         <div className="h-14" aria-hidden="true" />
