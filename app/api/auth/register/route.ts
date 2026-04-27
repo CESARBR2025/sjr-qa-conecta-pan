@@ -215,7 +215,7 @@ Este enlace expirará en 24 horas.
       {
         ok: true,
         message: "Registro exitoso. Revisa tu correo para confirmar tu cuenta.",
-        redirect: "/en-espera",
+        redirect: "/en-espera-validation",
       },
       { status: 201 },
     );

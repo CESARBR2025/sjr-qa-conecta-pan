@@ -120,7 +120,9 @@ export async function GET(req: NextRequest) {
     /**
      * 9. Redireccionar a pantalla "en espera"
      */
-    return NextResponse.redirect(`${process.env.LOCAL_HOST}/login/en-espera`);
+    return NextResponse.redirect(
+      `${process.env.LOCAL_HOST}/login/en-espera-validation`,
+    );
   } catch (error) {
     console.error("VERIFY_ACCOUNT_ERROR:", error);
 
