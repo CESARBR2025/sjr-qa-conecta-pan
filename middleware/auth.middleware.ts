@@ -37,7 +37,7 @@ export async function authMiddleware(request: NextRequest) {
     // 2. Verificar JWT
     const payload = verifyToken(token);
 
-    if (!payload || !payload.userCusId) {
+    if (!payload || !payload.idUser) {
       return NextResponse.json(
         { error: "Invalid or expired token" },
         { status: 401 },
@@ -45,7 +45,7 @@ export async function authMiddleware(request: NextRequest) {
     }
 
     //Obtener datos auth de usuario
-    const datosAuthUser = await service.svBuscarUsuarioCus(payload?.userCusId);
+    const datosAuthUser = await service.svBuscarUsuarioCus(payload.correo);
 
     if (!datosAuthUser) {
       return NextResponse.json(

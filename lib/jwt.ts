@@ -14,6 +14,7 @@ export interface JwtPayload {
   apMaterno: string;
   iat?: number;
   exp?: number;
+  correo: string;
 }
 
 // Crear token

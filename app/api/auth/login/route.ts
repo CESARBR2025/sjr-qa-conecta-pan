@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
       nombres: user!.nombres,
       apPaterno: user!.apPaterno,
       apMaterno: user!.apMaterno,
+      correo: user.email,
     });
 
     // 5. Redirect por rol
