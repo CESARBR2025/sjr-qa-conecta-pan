@@ -9,6 +9,7 @@ export default function RegisterForm() {
     const [apellidoPaterno, setApellidoPaterno] = useState("");
     const [apellidoMaterno, setApellidoMaterno] = useState("");
     const [email, setEmail] = useState("");
+    const [curp, setCurp] = useState("");
     const [password, setPassword] = useState("");
 
     const [showPassword, setShowPassword] = useState(false);
@@ -25,7 +26,7 @@ export default function RegisterForm() {
         setError("");
 
         try {
-            const response = await fetch("/api/register", {
+            const response = await fetch("/api/auth/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -36,6 +37,7 @@ export default function RegisterForm() {
                     apellidoMaterno,
                     email,
                     password,
+                    curp
                 }),
             });
 
@@ -100,6 +102,7 @@ export default function RegisterForm() {
 
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 md:space-y-6">
 
+
                 {/* NOMBRE */}
                 <div>
                     <label className="ml-1 text-[13px] font-medium text-[#8A96B0]">
@@ -122,6 +125,8 @@ export default function RegisterForm() {
                         />
                     </div>
                 </div>
+
+
 
                 {/* APELLIDOS */}
                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-3 sm:justify-between">
@@ -170,6 +175,29 @@ export default function RegisterForm() {
                                 className="w-full rounded-xl border border-[#DDE3F0] bg-[#FFFFFF] py-3.5 pl-11 pr-4 text-sm text-[#1A2340] placeholder:text-[#8A96B0] outline-none transition focus:border-[#1F69E7] focus:ring-4 focus:ring-[rgba(31,105,231,0.08)]"
                             />
                         </div>
+                    </div>
+                </div>
+
+                {/* CURP */}
+                <div>
+                    <label className="ml-1 text-[13px] font-medium text-[#8A96B0]">
+                        Curp
+                    </label>
+
+                    <div className="relative group mt-2">
+                        <User
+                            size={16}
+                            className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8A96B0] group-focus-within:text-[#1F69E7] transition"
+                        />
+
+                        <input
+                            type="text"
+                            value={curp}
+                            onChange={(e) => setCurp(e.target.value)}
+                            required
+                            placeholder="LOGJ021102HQTRSSA2"
+                            className="w-full rounded-xl border border-[#DDE3F0] bg-[#FFFFFF] py-3.5 pl-11 pr-4 text-sm text-[#1A2340] placeholder:text-[#8A96B0] outline-none transition focus:border-[#1F69E7] focus:ring-4 focus:ring-[rgba(31,105,231,0.08)]"
+                        />
                     </div>
                 </div>
 
