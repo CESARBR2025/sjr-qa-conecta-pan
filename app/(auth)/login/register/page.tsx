@@ -57,6 +57,9 @@ export default function RegisterForm() {
             setEmail("");
             setPassword("");
 
+            // 👇 AQUÍ EL CAMBIO IMPORTANTE
+            router.push("/login/check-email");
+
         } catch (err) {
             setError("Error de conexión con el servidor");
             console.error(err);
