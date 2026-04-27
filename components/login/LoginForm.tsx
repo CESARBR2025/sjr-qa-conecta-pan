@@ -196,16 +196,35 @@ export default function LoginForm() {
                   type="submit"
                   disabled={loading}
                   className="w-full rounded-xl py-3.5 
-            font-semibold text-md text-white bg-gradient-to-br from-[#1F69E7] to-[#3E83F0] flex items-center justify-center text-white font-bold  shadow-[0_3px_10px_rgba(31,105,231,0.3)] cursor-pointer hover:scale-102 transition-transform"
+    font-semibold text-md text-white 
+    bg-gradient-to-br from-[#1F69E7] to-[#3E83F0] 
+    flex items-center justify-center 
+    shadow-[0_3px_10px_rgba(31,105,231,0.3)] 
+    cursor-pointer hover:scale-102 transition-transform"
                 >
                   {loading ? (
-                    <div className='flex justify-center items-center'><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div></div>
-
-
-
+                    <div className="flex justify-center items-center">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    </div>
                   ) : (
                     "Iniciar sesión"
                   )}
+                </button>
+
+                {/* CREATE ACCOUNT */}
+                <button
+                  type="button"
+                  onClick={() => router.push("/login/register")}
+                  className="w-full rounded-xl py-3.5
+    font-semibold text-md
+    border border-[#DDE3F0]
+    text-[#1F69E7]
+    bg-white
+    hover:bg-[#EFF4FE]
+    transition-all
+    cursor-pointer"
+                >
+                  Crear cuenta nueva
                 </button>
 
 
