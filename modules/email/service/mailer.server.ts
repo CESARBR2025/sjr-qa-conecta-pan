@@ -17,7 +17,8 @@ export interface EnviarCorreoParams {
 export async function enviarCorreoAuth() {
   const CORREO = "barcenasrosalescesarivan@gmail.com";
 
-  const url = "http://localhost:3000/admin/usuarios/solicitudes";
+  const url =
+    "https://sjr-qa-conecta-pan.vercel.app/admin/usuarios/solicitudes";
 
   const text = `
     Existe una nueva solicitud de usuario pendiente de revisión.
