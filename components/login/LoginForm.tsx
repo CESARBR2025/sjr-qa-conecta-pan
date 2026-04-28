@@ -89,6 +89,7 @@ export default function LoginForm() {
               alt="Logo Conecta PAN"
               className="h-7 w-auto object-contain"
             />
+
           </div>
 
           {/* DIVIDER */}
@@ -123,7 +124,7 @@ export default function LoginForm() {
 
             {/* CARD */}
             <div className="w-full flex flex-col justify-center">
-              <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8 lg:space-y-10">
+              <form onSubmit={handleSubmit} className="space-y-5">
 
                 {/* EMAIL */}
                 <div>
