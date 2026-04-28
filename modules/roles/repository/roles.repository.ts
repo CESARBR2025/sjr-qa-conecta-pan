@@ -14,12 +14,23 @@ FROM public.roles;
   `,
 
   ACTUALIZAR_ROL_USUARIO_1: `
-  UPDATE users
-    SET
-     role_id = $1,
-     estatus = 'approval'
-    WHERE id = $2;
-  `,
+ UPDATE users u
+SET
+  role_id = $1,
+  estatus = 'approval'
+FROM roles r
+WHERE u.id = $2
+  AND r.id = $1
+RETURNING 
+  u.id,
+  u.email,
+  u.nombre,
+  u.ap_paterno,
+  u.ap_materno,
+  u.role_id,
+  r.name AS role_name,
+  u.estatus,
+  u.updated_at;`,
 } as const;
 
 // ============================================================
@@ -32,14 +43,19 @@ export class RolesRepository {
 
     return res.rows;
   }
-  async actualizarRolUsuarioNuevo(
+  async actualizarRolUsuarioNuevoRP(
     idRol: number,
     userId: string,
   ): Promise<void> {
     try {
       console.log(userId);
 
-      await POOL_PG.query(SQL.ACTUALIZAR_ROL_USUARIO_1, [idRol, userId]);
+      const resp = await POOL_PG.query(SQL.ACTUALIZAR_ROL_USUARIO_1, [
+        idRol,
+        userId,
+      ]);
+      console.log(resp);
+      return resp.rows[0];
     } catch (error) {
       console.log(error);
       throw error;

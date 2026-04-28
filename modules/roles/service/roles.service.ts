@@ -18,8 +18,9 @@ export class RolesService {
     userId: string,
   ): Promise<any> {
     console.log(userId);
-    const rows = await this.repo.actualizarRolUsuarioNuevo(idRol, userId);
-
+    console.log(idRol);
+    const rows = await this.repo.actualizarRolUsuarioNuevoRP(idRol, userId);
+    console.log(rows);
     return rows;
   }
 }
