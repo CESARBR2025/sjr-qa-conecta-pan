@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { ViewRolesTable } from "../types/roles.types";
 import { RolesService } from "./roles.service";
+import { sendMail } from "@/lib/email/mailer";
 
 type ActionReponse = { success: true } | { success: false; error: string };
 
@@ -54,6 +55,8 @@ export async function actualizarRolAction(
       idRol,
       userId,
     );
+    console.log(dataUsuario);
+
     return {
       success: true,
       data: dataUsuario,

@@ -20,6 +20,7 @@ export interface ColumnInterface {
 interface DataTableProps {
   columns: ColumnInterface[];
   data: any[];
+  onRowSelected?: (row: any) => void
 }
 
 function getInitials(name: string) {
@@ -205,6 +206,7 @@ function renderCell(column: ColumnInterface, row: any) {
 export default function DataTable({
   columns,
   data,
+  onRowSelected
 }: DataTableProps) {
 
   const desktopColumns = columns;
@@ -244,6 +246,7 @@ export default function DataTable({
                 <tr
                   key={index}
                   className="border-b border-[#F1F4FA] hover:bg-[#F7FAFF] transition"
+                  onClick={() => onRowSelected?.(row)}
                 >
                   {desktopColumns.map((column) => (
                     <td
@@ -282,6 +285,7 @@ export default function DataTable({
                 <tr
                   key={index}
                   className="border-b border-[#F1F4FA] hover:bg-[#F7FAFF] transition"
+                  onClick={() => onRowSelected?.(row)}
                 >
                   {mobileColumns.map((column) => (
                     <td

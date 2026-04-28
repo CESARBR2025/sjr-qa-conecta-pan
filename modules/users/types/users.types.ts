@@ -35,6 +35,7 @@ export interface DBUsersAsigarRol {
   ultimo_acceso: string;
   rol_name: string;
   user_id: string;
+  email: string;
 }
 
 // ════════════════════════════════════════════════════
@@ -48,6 +49,7 @@ export interface ViewUsersAsigarRol {
   ultimoAcceso: string;
   nombreRol: string;
   userId: string;
+  email: string;
 }
 
 //** Regreso de mapper */

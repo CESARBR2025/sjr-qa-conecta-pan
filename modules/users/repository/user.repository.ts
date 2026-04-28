@@ -31,7 +31,8 @@ select
 	 concat_ws(' ', u.nombre , u.ap_paterno ) as nombre,
 	u.curp , u.estatus, u.last_login  as ultimo_acceso ,
 	r."name" as rol_name,
-  u.id as user_id
+  u.id as user_id,
+  u.email
 	
 from users u 
 join roles r on u.role_id  = r.id 

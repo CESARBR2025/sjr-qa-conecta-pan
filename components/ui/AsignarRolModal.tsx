@@ -1,5 +1,6 @@
 "use client";
 
+
 import { actualizarRolAction, listarRolesAction } from "@/modules/roles/service/roles.server";
 import { ViewRolesTable } from "@/modules/roles/types/roles.types";
 import { ViewUsersAsigarRol } from "@/modules/users/types/users.types";
@@ -9,7 +10,7 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSucces: () => void;
-  initialData: ViewUsersAsigarRol[];
+  initialData: ViewUsersAsigarRol;
 }
 
 export default function AsignarRoleModal({
@@ -18,6 +19,8 @@ export default function AsignarRoleModal({
   onSucces,
   initialData,
 }: Props) {
+
+  console.log(initialData)
   const [roles, setRoles] = useState<ViewRolesTable[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingSuccess, setLoadingSuccess] = useState<boolean>(false);
@@ -53,9 +56,12 @@ export default function AsignarRoleModal({
 
   if (!isOpen) return null;
 
-  const user = initialData[0];
-  const initials = user.nombreUsuario
-    ?.split(" ")
+
+
+  const initials = initialData?.nombreUsuario
+    ?.trim()
+    .split(" ")
+    .filter(Boolean)
     .map((w: string) => w[0])
     .join("")
     .toUpperCase()
@@ -71,13 +77,17 @@ export default function AsignarRoleModal({
     if (!selectedRole) return;
     setLoadingSuccess(true);
 
-    console.log(initialData[0].userId)
+    console.log(initialData.userId)
+
     const response = await actualizarRolAction(
       Number(selectedRole),
-      initialData[0].userId
+      initialData.userId
     );
 
     if (response.success) {
+
+
+
       setShowNotification(true);
       setTimeout(() => {
         setShowNotification(false);
@@ -125,7 +135,7 @@ export default function AsignarRoleModal({
             Rol asignado correctamente
           </p>
           <p className="text-[12px] text-gray-400 mt-0.5">
-            {user.nombreUsuario} ahora tiene el rol actualizado.
+            {initialData.nombreUsuario} ahora tiene el rol actualizado.
           </p>
         </div>
       </div>
@@ -249,10 +259,10 @@ export default function AsignarRoleModal({
 
               <div className="min-w-0 flex-1">
                 <p className="text-[13.5px] font-semibold text-[#111827] truncate leading-snug">
-                  {user.nombreUsuario || "Sin nombre"}
+                  {initialData.nombreUsuario || "Sin nombre"}
                 </p>
                 <p className="text-[11.5px] text-[#9CA3AF] font-mono tracking-wide mt-0.5">
-                  {user.curp}
+                  {initialData.curp}
                 </p>
               </div>
 

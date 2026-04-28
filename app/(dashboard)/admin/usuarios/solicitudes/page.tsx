@@ -4,27 +4,115 @@ import ButtonComponent from "@/components/ui/ButtonComponent";
 import Card from "@/components/ui/Card";
 import DataTable, { ColumnInterface } from "@/components/ui/DataTable";
 import AsignarRoleModal from "@/components/ui/AsignarRolModal";
-import { listarUsuariosPendientesAction, listarUsuariosRegistradosAction } from "@/modules/users/services/users.server";
+import { listarUsuariosRegistradosAction } from "@/modules/users/services/users.server";
 import { ViewUsersAsigarRol } from "@/modules/users/types/users.types";
 import { ListFilterPlus } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
-export default function SolicitudesNuevasPage() {
+/*
+//2. Enviar correo
+    // 10. Enviar correo
+    const text = `
+Hola ${user.nombreUsuario || "Usuario"},
+
+Te informamos que tu rol en la plataforma ha sido actualizado.
+
+Nuevo rol asignado: ${user.nombreRol}
+
+A partir de este momento, tendrás acceso a las funcionalidades correspondientes a este rol dentro del sistema.
+
+Si tienes alguna duda o consideras que esto es un error, puedes contactar al equipo de administración.
+
+Saludos,
+Equipo de la plataforma
+`;
+
+    const html = `
+  <div style="font-family: Arial, sans-serif; padding: 24px; background-color: #FAFBFF; border-radius: 12px;">
+
+    <h2 style="color: #1F69E7; margin-bottom: 16px;">
+      Actualización de rol en la plataforma
+    </h2>
+
+    <p>
+      Hola <strong>${user.nombreUsuario || "Usuario"}</strong>,
+    </p>
+
+    <p>
+      Te informamos que tu rol en la plataforma ha sido <strong>actualizado</strong>.
+    </p>
+
+    <div style="
+      margin: 20px 0;
+      padding: 16px;
+      background-color: #ffffff;
+      border: 1px solid #EAF1FC;
+      border-radius: 10px;
+    ">
+      <p style="margin: 0; font-size: 14px; color: #666;">
+        Nuevo rol asignado:
+      </p>
+      <p style="margin: 6px 0 0 0; font-size: 18px; font-weight: 700; color: #1F69E7;">
+        ${user.nombreUsuario}
+      </p>
+    </div>
+
+    <p style="font-size: 14px; color: #333;">
+      A partir de este momento, tendrás acceso a las funcionalidades correspondientes a este rol dentro del sistema.
+    </p>
+
+    <p style="font-size: 14px; color: #333;">
+      Si no reconoces este cambio o consideras que es un error, por favor contacta al equipo de administración.
+    </p>
+
+    <p style="margin-top: 24px; font-size: 14px; color: #666;">
+      Saludos,<br/>
+      Equipo de la plataforma
+    </p>
+
+  </div>
+`;
+
+    sendMail({
+      to: user.email,
+      subject: "Nueva solicitud de usuario",
+      text,
+      html,
+    }).catch((err) => {
+      console.error("ERROR EMAIL ADMIN:", err);
+    });
+
+*/
+
+export default function NuevasSolicitudesUsuarios() {
   const [verDetalles, setVerDetalles] = useState(false);
   const [data, setData] = useState<ViewUsersAsigarRol[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userSelected, setUserSelected] = useState<ViewUsersAsigarRol>()
 
   const [showSearch, setShowSearch] = useState(false);
   const [search, setSearch] = useState("");
 
+  // Obtener datos de registro seleccionado
+  const handleRowClick = (row: any) => {
+    setUserSelected(row);
+    setVerDetalles(true);
+  };
+
+  console.log(userSelected)
+
+
+  // Filtrar el valor que se esta filtrando
   const handleToggleSearch = () => {
     setShowSearch((prev) => !prev);
   };
 
+
+  //Cargando users 
   const loadUsers = async () => {
     setLoading(true);
 
-    const res = await listarUsuariosPendientesAction();
+    const res = await listarUsuariosRegistradosAction();
 
     if (res.success) {
       setData(res.data ?? []);
@@ -36,6 +124,8 @@ export default function SolicitudesNuevasPage() {
   useEffect(() => {
     loadUsers();
   }, []);
+
+  console.log(data)
 
   /**
    * IMPORTANTE:
@@ -114,11 +204,11 @@ export default function SolicitudesNuevasPage() {
           {/* TITLES */}
           <div className="w-full">
             <h2 className="text-lg sm:text-xl font-semibold mb-2">
-              Nuevas solicitudes de acceso
+              Nuevas solicitudes
             </h2>
 
             <p className="text-sm sm:text-base text-gray-600">
-              Gestiona las solicitudes de acceso
+              Gestiona los accesos al sistema de los usuarios
             </p>
           </div>
 
@@ -136,12 +226,12 @@ export default function SolicitudesNuevasPage() {
         </div>
 
         {/* MODAL */}
-        {verDetalles && (
+        {verDetalles && userSelected && (
           <AsignarRoleModal
             isOpen={verDetalles}
             onClose={() => setVerDetalles(false)}
             onSucces={loadUsers}
-            initialData={data}
+            initialData={userSelected}
           />
         )}
 
@@ -174,6 +264,7 @@ export default function SolicitudesNuevasPage() {
           <DataTable
             columns={columns}
             data={filteredData}
+            onRowSelected={handleRowClick}
           />
         </div>
       </Card>

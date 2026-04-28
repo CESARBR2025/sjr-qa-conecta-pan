@@ -9,5 +9,6 @@ export function mapUsersAsignarRol(row: DBUsersAsigarRol): ViewUsersAsigarRol {
     ultimoAcceso: row.ultimo_acceso,
     nombreRol: row.rol_name,
     userId: row.user_id,
+    email: row.email,
   };
 }
