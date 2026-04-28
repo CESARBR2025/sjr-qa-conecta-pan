@@ -8,7 +8,7 @@ interface ButtonProps {
   children: ReactNode;
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
-  variant?: "primary" | "ghost" | "success" | "warning" | "danger";
+  variant?: "primary" | "ghost" | "success" | "warning" | "danger" | "ghostBlue";
   disabled?: boolean;
   loading?: boolean;
   className?: string;
@@ -78,6 +78,12 @@ export default function ButtonComponent({
       border-[#EDF0F6]
       hover:bg-[#EFF4FE]
     `,
+    ghostBlue: `
+      bg-white
+      text-[#1F69E7]
+      border-[#EEF3FD]
+      hover:bg-[#EFF4FE]
+    `,
   };
 
   const iconColor = variant === 'ghost' ? 'text-gray-500 font-semibold' : 'text-current'
@@ -91,6 +97,7 @@ export default function ButtonComponent({
         ${baseStyles}
         ${variants[variant]}
         ${className}
+        border-2
       `}
     >
       {loading && <Loader2 size={16} className="animate-spin" />}

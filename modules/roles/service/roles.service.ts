@@ -1,6 +1,9 @@
-import { mapUsersAsignarRol } from "../mappers/roles.mappers";
+import {
+  mapAgruparRolesPermisos,
+  mapUsersAsignarRol,
+} from "../mappers/roles.mappers";
 import { RolesRepository } from "../repository/roles.repository";
-import { ViewRolesTable } from "../types/roles.types";
+import { ViewRolesPermisos, ViewRolesTable } from "../types/roles.types";
 
 export class RolesService {
   private repo = new RolesRepository();
@@ -22,5 +25,13 @@ export class RolesService {
     const rows = await this.repo.actualizarRolUsuarioNuevoRP(idRol, userId);
     console.log(rows);
     return rows;
+  }
+
+  //Traer roles y permisos
+  // Treaer usuarios en rol CIDADANO pendientes de asignar
+  async svListarRolesPermisos(): Promise<ViewRolesPermisos[]> {
+    const rows = await this.repo.agruparRolesPermisosRP();
+
+    return rows.map(mapAgruparRolesPermisos);
   }
 }

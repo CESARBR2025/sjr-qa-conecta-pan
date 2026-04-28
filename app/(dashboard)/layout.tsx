@@ -4,7 +4,7 @@ import Sidebar from "@/components/sideBar/SideBar";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-screen bg-[#F0F4FF] overflow-hidden">
+    <div className="flex h-screen  overflow-hidden">
       {/* Sidebar visible en md+ */}
       <Sidebar />
 

@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { ViewRolesTable } from "../types/roles.types";
+import { ViewRolesPermisos, ViewRolesTable } from "../types/roles.types";
 import { RolesService } from "./roles.service";
 import { sendMail } from "@/lib/email/mailer";
 
@@ -12,6 +12,12 @@ type ActionReponse = { success: true } | { success: false; error: string };
 export type RolesResponse = {
   success: boolean;
   data: ViewRolesTable[] | null;
+  error?: string;
+};
+
+export type RolesPermisosResponse = {
+  success: boolean;
+  data: ViewRolesPermisos[] | null;
   error?: string;
 };
 
@@ -129,6 +135,27 @@ Equipo de la plataforma
       console.error("ERROR EMAIL ADMIN:", err);
     });
 
+    return {
+      success: true,
+      data: dataUsuario,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      return { success: false, data: null, error: error.message };
+    }
+
+    return {
+      success: false,
+      data: null,
+      error: "Ocurrio error inesperado",
+    };
+  }
+}
+
+export async function listarRolesPermisosAction(): Promise<RolesPermisosResponse> {
+  const service = new RolesService();
+  try {
+    const dataUsuario = await service.svListarRolesPermisos();
     return {
       success: true,
       data: dataUsuario,

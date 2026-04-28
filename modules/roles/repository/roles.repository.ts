@@ -1,4 +1,8 @@
-import { DBRolesTable, ViewRolesTable } from "../types/roles.types";
+import {
+  DBRolesPermisos,
+  DBRolesTable,
+  ViewRolesTable,
+} from "../types/roles.types";
 
 import { POOL_PG } from "@/lib/db";
 
@@ -31,6 +35,20 @@ RETURNING
   r.name AS role_name,
   u.estatus,
   u.updated_at;`,
+
+  GROUP_ROLES_PERMISOS: `
+  SELECT 
+  r.name AS role,
+  r.description,
+  ARRAY_AGG(p.name ORDER BY p.name) AS permissions
+FROM roles r
+JOIN role_permissions rp ON r.id = rp.role_id
+JOIN permissions p ON rp.permission_id = p.id
+GROUP BY r.name, r.description 
+ORDER BY r.name;
+
+
+  `,
 } as const;
 
 // ============================================================
@@ -56,6 +74,18 @@ export class RolesRepository {
       ]);
       console.log(resp);
       return resp.rows[0];
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  //Agrupar roles y permisos
+  async agruparRolesPermisosRP(): Promise<DBRolesPermisos[]> {
+    try {
+      const resp = await POOL_PG.query(SQL.GROUP_ROLES_PERMISOS);
+      console.log(resp);
+      return resp.rows;
     } catch (error) {
       console.log(error);
       throw error;

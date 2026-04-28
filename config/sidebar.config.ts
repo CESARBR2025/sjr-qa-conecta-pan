@@ -29,8 +29,8 @@ export const menuByRole: Record<UserRole, any[]> = {
       ],
     },
     {
-      label: "KPIs",
-      href: "/admin",
+      label: "Roles",
+      href: "/admin/control/roles-permisos",
       icon: House,
       group: "Principal",
     },

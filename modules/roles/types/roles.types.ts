@@ -15,9 +15,21 @@ export interface DBRolesTable {
   created_at: string;
 }
 
+export interface DBRolesPermisos {
+  role: string;
+  description: string;
+  permissions: string[];
+}
+
 // ════════════════════════════════════════════════════
 // TIPOS DE VISTA (LO QUE REGRESA EL MAPPER)
 // ════════════════════════════════════════════════════
+
+export interface ViewRolesPermisos {
+  roleName: string;
+  description: string;
+  permissions: string[];
+}
 export interface ViewRolesTable {
   idRol: number;
   nombreRol: string;
