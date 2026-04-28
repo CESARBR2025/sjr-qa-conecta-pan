@@ -14,7 +14,7 @@ export type UsersResponse = {
   error?: string;
 };
 
-export async function buscarUsuarioCusAction(
+export async function buscarUsuarioCorreoAction(
   correo: string,
 ): Promise<UsersResponse> {
   console.log(correo);

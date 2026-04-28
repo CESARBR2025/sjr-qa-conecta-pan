@@ -1,15 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generarJWT } from "@/lib/jwt";
 import { AuthErrors } from "@/lib/errors";
-import { cusGetUserInfo, cusLogin } from "@/lib/cus";
-import { enviarCorreoAuth } from "@/modules/email/service/mailer.server";
-
-import {
-  buscarUsuarioCusAction,
-  registrarUsuarioAction,
-} from "@/modules/login/services/login.server";
-import { ViewUsers } from "@/modules/login/types/login.types";
-
 import crypto from "crypto";
 import { POOL_PG } from "@/lib/db";
 import bcrypt from "bcryptjs";
@@ -18,11 +8,10 @@ import { sendMail } from "@/lib/email/mailer";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+
     const { nombre, apellidoPaterno, apellidoMaterno, email, password, curp } =
       body;
 
-    console.log("entro");
-    console.log(body);
     // 1. Validar campos requeridos
     if (
       !nombre ||
@@ -215,7 +204,7 @@ Este enlace expirará en 24 horas.
       {
         ok: true,
         message: "Registro exitoso. Revisa tu correo para confirmar tu cuenta.",
-        redirect: "/en-espera-validation",
+        redirect: "/login/check-email",
       },
       { status: 201 },
     );

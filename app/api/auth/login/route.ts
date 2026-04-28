@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generarJWT } from "@/lib/jwt";
 import { AuthErrors } from "@/lib/errors";
-import { cusGetUserInfo, cusLogin } from "@/lib/cus";
-import { enviarCorreoAuth } from "@/modules/email/service/mailer.server";
-import { POOL_PG as db } from "@/lib/db";
-import {
-  buscarUsuarioCusAction,
-  registrarUsuarioAction,
-} from "@/modules/login/services/login.server";
-import { ViewUsers } from "@/modules/login/types/login.types";
-import { LoginService } from "@/modules/login/services/login.service";
+import { buscarUsuarioCorreoAction } from "@/modules/login/services/login.server";
 
 export async function POST(req: NextRequest) {
   console.log("entro");
@@ -23,7 +15,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Buscar usuario en BD local
-    let dataUser = await buscarUsuarioCusAction(correo);
+    let dataUser = await buscarUsuarioCorreoAction(correo);
     console.log(dataUser);
 
     if (!dataUser || !dataUser.data) {
