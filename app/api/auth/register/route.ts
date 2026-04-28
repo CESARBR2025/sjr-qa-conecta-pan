@@ -105,8 +105,7 @@ export async function POST(req: NextRequest) {
     updated_at,
     curp,
     estatus,
-    email_verified,
-    id_usuario_general
+    email_verified
   )
   VALUES (
     $1,
@@ -121,8 +120,7 @@ export async function POST(req: NextRequest) {
     NOW(),
     $7,
     'pending_verification',
-    false,
-    10
+    false
   )
   RETURNING id
   `,

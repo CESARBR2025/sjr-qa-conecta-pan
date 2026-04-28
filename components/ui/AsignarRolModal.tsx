@@ -73,7 +73,6 @@ export default function AsignarRoleModal({
 
     console.log(initialData[0].userId)
     const response = await actualizarRolAction(
-      initialData[0].idCus,
       Number(selectedRole),
       initialData[0].userId
     );

@@ -15,17 +15,10 @@ FROM public.roles;
 
   ACTUALIZAR_ROL_USUARIO_1: `
   UPDATE users
-SET role_id = $1
-WHERE id_usuario_general = $2;
-  `,
-
-  ACTUALIZAR_ROL_USUARIO_2: `
-  UPDATE users_status
-SET 
-  status = 'ASIGNADO',
-  updated_at = NOW()
-WHERE user_id = $1;
-  
+    SET
+     role_id = $1,
+     estatus = 'approval'
+    WHERE id = $2;
   `,
 } as const;
 
@@ -39,35 +32,17 @@ export class RolesRepository {
 
     return res.rows;
   }
-
   async actualizarRolUsuarioNuevo(
-    idCus: number,
     idRol: number,
     userId: string,
   ): Promise<void> {
-    const client = await POOL_PG.connect();
-    console.log(userId);
-
     try {
-      await client.query("BEGIN");
+      console.log(userId);
 
-      // 1. Insert en usuarios para obtener el id
-      const userResult = await client.query(SQL.ACTUALIZAR_ROL_USUARIO_1, [
-        idRol,
-        idCus,
-      ]);
-
-      // 2. Insert en users_status
-      const userResultDos = await client.query(SQL.ACTUALIZAR_ROL_USUARIO_2, [
-        userId,
-      ]);
-      await client.query("COMMIT");
+      await POOL_PG.query(SQL.ACTUALIZAR_ROL_USUARIO_1, [idRol, userId]);
     } catch (error) {
-      await client.query("ROLLBACK");
       console.log(error);
       throw error;
-    } finally {
-      client.release();
     }
   }
 }

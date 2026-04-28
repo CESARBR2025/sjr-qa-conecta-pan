@@ -11,4 +11,10 @@ export class UsersService {
 
     return rows.map(mapUsersAsignarRol);
   }
+
+  async svListarUsuariosRegistrados(): Promise<ViewUsersAsigarRol[]> {
+    const rows = await this.repo.listarUsuariosRegistradosRP();
+
+    return rows.map(mapUsersAsignarRol);
+  }
 }

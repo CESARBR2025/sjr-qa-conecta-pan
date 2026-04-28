@@ -37,7 +37,7 @@ export async function sendMail(options: MailOptions): Promise<void> {
     attachments: [
       {
         filename: "Estrella.png", // usa PNG mejor
-        path: path.join(process.cwd(), "public/PAN.png"), // ruta LOCAL en tu servidor
+        path: path.join(process.cwd(), "public/conecta-pan-logo-f2.png"), // ruta LOCAL en tu servidor
         cid: "logo_estrella", // 👈 este es el que usas en el HTML
       },
     ],

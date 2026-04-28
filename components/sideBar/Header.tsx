@@ -42,26 +42,11 @@ export default function Header() {
 
       {/* Mobile branding */}
       <div className="flex md:hidden items-center gap-3 min-w-0">
-        <div
-          className="
-            w-10 h-10 rounded-2xl
-            bg-gradient-to-br from-[#1F69E7] to-[#3E83F0]
-            flex items-center justify-center
-            shadow-[0_6px_18px_rgba(31,105,231,0.18)]
-            shrink-0
-          "
-        >
-          <span className="text-white text-sm font-bold">P</span>
-        </div>
-
-        <span
-          className="
-            text-sm font-semibold text-[#1A2340]
-            truncate
-          "
-        >
-          Sistema
-        </span>
+        <img
+          src="/conecta-pan-logo-f2.png"
+          alt="Logo Conecta PAN"
+          className="h-7 w-auto object-contain"
+        />
       </div>
 
       {/* Right actions */}

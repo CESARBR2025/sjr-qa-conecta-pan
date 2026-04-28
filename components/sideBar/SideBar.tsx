@@ -148,22 +148,16 @@ function SidebarContent({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center gap-3 px-5 py-6 border-b border-blue-50 flex-shrink-0">
-        <div className="w-12 h-12 flex items-center justify-center flex-shrink-0">
-          <Image
-            src="/pan-side-bar.png"
-            alt="PAN"
-            width={48}
-            height={48}
-            className="object-cover w-full h-full"
-          />
-        </div>
+      <div className="flex items-center justify-center gap-3 px-5 py-6 border-b border-blue-50 flex-shrink-0">
 
-        <div>
-          <p className="font-bold text-base text-[#6B778C]">
-            Gestión de Eventos
-          </p>
-        </div>
+        <img
+          src="/conecta-pan-logo-f2.png"
+          alt="Logo Conecta PAN"
+          className="h-8 w-auto object-contain"
+        />
+
+
+
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">

@@ -5,7 +5,7 @@ export function mapUsersAsignarRol(row: DBUsersAsigarRol): ViewUsersAsigarRol {
     idCus: row.id_usuario_general,
     nombreUsuario: row.nombre,
     curp: row.curp,
-    status: row.status,
+    estatus: row.estatus,
     ultimoAcceso: row.ultimo_acceso,
     nombreRol: row.rol_name,
     userId: row.user_id,

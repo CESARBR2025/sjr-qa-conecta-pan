@@ -43,15 +43,14 @@ type ActualizarRolResponse = {
 };
 
 export async function actualizarRolAction(
-  idCus: number,
   idRol: number,
   userId: string,
 ): Promise<ActualizarRolResponse> {
   const service = new RolesService();
   console.log(userId);
+  console.log(idRol);
   try {
     const dataUsuario = await service.svActualizarRolUsuarioNuevo(
-      idCus,
       idRol,
       userId,
     );

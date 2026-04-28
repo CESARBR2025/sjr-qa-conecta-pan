@@ -16,7 +16,14 @@ const routePermissions: Record<string, string[]> = {
   "/eventos": ["ADMIN", "SUPER_ADMIN"],
 };
 
-const publicRoutes = ["/login", "/register", "/verify", "/unauthorized"];
+const publicRoutes = [
+  "/login",
+  "/register",
+  "/verify",
+  "/unauthorized",
+  "/login/check-email",
+  "/login/en-espera-validation",
+];
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
 

@@ -31,7 +31,7 @@ export interface DBUsersAsigarRol {
   id_usuario_general: number;
   nombre: string;
   curp: string;
-  status: string;
+  estatus: string;
   ultimo_acceso: string;
   rol_name: string;
   user_id: string;
@@ -44,7 +44,7 @@ export interface ViewUsersAsigarRol {
   idCus: number;
   nombreUsuario: string;
   curp: string;
-  status: string;
+  estatus: string;
   ultimoAcceso: string;
   nombreRol: string;
   userId: string;

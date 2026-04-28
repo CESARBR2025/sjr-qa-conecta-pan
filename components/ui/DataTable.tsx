@@ -1,5 +1,4 @@
 // components/ui/DataTable.tsx
-
 import { Eye, PenLine, Trash2 } from "lucide-react";
 import { ReactNode } from "react";
 
@@ -7,6 +6,7 @@ export interface ColumnInterface {
   key: string;
   label: string;
   type?: "text" | "avatarName" | "status" | "actions" | "date";
+
   render?: (value: any, row: any) => ReactNode;
 
   actions?: {
@@ -14,6 +14,7 @@ export interface ColumnInterface {
     onClick: (row: any) => void
     variant?: "edit" | "delete" | "view"
   }[]
+  showOnMobile: boolean
 }
 
 interface DataTableProps {
@@ -73,7 +74,7 @@ const getAvatarColor = (name: string) => {
 
 function renderCell(column: ColumnInterface, row: any) {
   const value = row[column.key];
-
+  console.log(value)
   if (column.render) {
     return column.render(value, row);
   }
@@ -83,7 +84,13 @@ function renderCell(column: ColumnInterface, row: any) {
       return (
         <span>
           {value
-            ? new Date(value).toLocaleDateString("es-MX")
+            ? new Intl.DateTimeFormat("es-MX", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }).format(new Date(value))
             : "-"}
         </span>
       );
@@ -112,14 +119,22 @@ function renderCell(column: ColumnInterface, row: any) {
       );
 
     case "status":
+
+      // 1. Mapear clave
+      const statusMap: Record<string, string> = {
+        approval: "Asignado",
+        pending_approval: "Pendiente",
+      };
+
+      const label = statusMap[value] || "SIN ESTADO"
       return (
         <span
           className={`
     inline-flex items-center gap-2
     px-3 py-1 rounded-lg text-sm font-medium
-    ${value === "Activo"
+    ${value === "approval"
               ? "bg-[#EAF8F1] text-[#1F7A4D]"
-              : value === "Pendiente"
+              : value === "pending_approval"
                 ? "bg-[#FEFAF1] text-[#FB933D] border border-[#FEF5E5]"
                 : "bg-[#FFF0F0] text-[#B54747]"
             }
@@ -129,16 +144,16 @@ function renderCell(column: ColumnInterface, row: any) {
           <span
             className={`
       w-2 h-2 rounded-full
-      ${value === "Activo"
+      ${value === "approval"
                 ? "bg-[#1F7A4D]"
-                : value === "Pendiente"
+                : value === "pending_approval"
                   ? "bg-[#FB933D]"
                   : "bg-[#B54747]"
               }
     `}
           />
 
-          {value}
+          {label}
         </span>
       );
 
@@ -185,44 +200,105 @@ function renderCell(column: ColumnInterface, row: any) {
   }
 }
 
+
+
 export default function DataTable({
   columns,
   data,
 }: DataTableProps) {
-  return (
-    <div className="bg-white border border-[#EAF1FC] rounded-2xl shadow-[0px_4px_18px_rgba(31,105,231,0.05)] overflow-hidden">
-      <table className="w-full">
-        <thead className="bg-[#F8FAFF]">
-          <tr>
-            {columns.map((column) => (
-              <th
-                key={column.key}
-                className="px-6 py-4 text-left text-sm font-semibold text-[#6B778C] border-b border-[#EAF1FC]"
-              >
-                {column.label}
-              </th>
-            ))}
-          </tr>
-        </thead>
 
-        <tbody>
-          {data.map((row, index) => (
-            <tr
-              key={index}
-              className="border-b border-[#F1F4FA] hover:bg-[#F7FAFF] transition"
-            >
-              {columns.map((column) => (
-                <td
-                  key={column.key}
-                  className="px-6 py-4 text-sm text-[#1A2340]"
+  const desktopColumns = columns;
+
+  console.log(columns)
+
+  const mobileColumns = columns.filter(
+    (column) => column.showOnMobile
+  );
+
+  console.log(mobileColumns)
+
+
+  return (
+    <div className="space-y-6">
+
+
+      {/* DESKTOP + TABLET */}
+      <div className="hidden md:block">
+        <div className="bg-white border border-[#EAF1FC] rounded-2xl shadow-[0px_4px_18px_rgba(31,105,231,0.05)] overflow-x-auto">
+          <table className="w-full min-w-max">
+            <thead className="bg-[#F8FAFF]">
+              <tr>
+                {desktopColumns.map((column) => (
+                  <th
+                    key={column.key}
+                    className="px-6 py-4 text-left text-sm font-semibold text-[#6B778C] border-b border-[#EAF1FC]"
+                  >
+                    {column.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+
+            <tbody>
+              {data.map((row, index) => (
+                <tr
+                  key={index}
+                  className="border-b border-[#F1F4FA] hover:bg-[#F7FAFF] transition"
                 >
-                  {renderCell(column, row)}
-                </td>
+                  {desktopColumns.map((column) => (
+                    <td
+                      key={column.key}
+                      className="px-6 py-4 text-sm text-[#1A2340]"
+                    >
+                      {renderCell(column, row)}
+                    </td>
+                  ))}
+                </tr>
               ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* MOBILE */}
+      <div className="block md:hidden">
+        <div className="bg-white border border-[#EAF1FC] rounded-2xl shadow-[0px_4px_18px_rgba(31,105,231,0.05)] overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-[#F8FAFF]">
+              <tr>
+                {mobileColumns.map((column) => (
+                  <th
+                    key={column.key}
+                    className="px-4 py-4 text-left text-sm font-semibold text-[#6B778C] border-b border-[#EAF1FC]"
+                  >
+                    {column.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+
+            <tbody>
+              {data.map((row, index) => (
+                <tr
+                  key={index}
+                  className="border-b border-[#F1F4FA] hover:bg-[#F7FAFF] transition"
+                >
+                  {mobileColumns.map((column) => (
+                    <td
+                      key={column.key}
+                      className="px-4 py-4 text-sm text-[#1A2340]"
+                    >
+                      {renderCell(column, row)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
     </div>
   );
 }

@@ -13,16 +13,29 @@ import { POOL_PG } from "@/lib/db";
 
 const SQL = {
   LISTAR_USUARIOS_PENDIENTES: `
-   select
-	u.id_usuario_general , concat_ws(' ', u.nombre , u.ap_paterno ) as nombre,
-	u.curp , us.status, u.last_login  as ultimo_acceso ,
+   
+select
+	concat_ws(' ', u.nombre , u.ap_paterno ) as nombre,
+	u.curp , u.estatus, u.last_login  as ultimo_acceso ,
 	r."name" as rol_name,
   u.id as user_id
 	
-from users u
-join users_status us on us.user_id = u.id 
+from users u 
 join roles r on u.role_id  = r.id 
-where us.status = 'PENDIENTE'
+where u.estatus = 'pending_approval'
+  `,
+
+  LISTAR_USUARIOS_REGISTRADOS: `
+   
+select
+	 concat_ws(' ', u.nombre , u.ap_paterno ) as nombre,
+	u.curp , u.estatus, u.last_login  as ultimo_acceso ,
+	r."name" as rol_name,
+  u.id as user_id
+	
+from users u 
+join roles r on u.role_id  = r.id 
+where u.estatus = 'approval'
   `,
 } as const;
 
@@ -34,6 +47,15 @@ export class UsersRepository {
   async listarUsuariosPendientesRP(): Promise<DBUsersAsigarRol[]> {
     const res = await POOL_PG.query<DBUsersAsigarRol>(
       SQL.LISTAR_USUARIOS_PENDIENTES,
+    );
+
+    return res.rows;
+  }
+
+  // Usuarios registrados
+  async listarUsuariosRegistradosRP(): Promise<DBUsersAsigarRol[]> {
+    const res = await POOL_PG.query<DBUsersAsigarRol>(
+      SQL.LISTAR_USUARIOS_REGISTRADOS,
     );
 
     return res.rows;

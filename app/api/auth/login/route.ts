@@ -58,14 +58,15 @@ export async function POST(req: NextRequest) {
     });
 
     // 5. Redirect por rol
-    const redirectMap: Record<number, string> = {
-      4: "/admin",
-      5: "/operator",
-      6: "/recepcionista",
-      7: "/admin",
+    const redirectMap: Record<string, string> = {
+      ADMIN: "/admin",
+      OPERATOR: "/operator",
+      RECEPTIONIST: "/recepcionista",
+      CIUDADANO: "/login/en-espera-validation",
     };
 
-    const redirectTo = redirectMap[user!.rolId] ?? "/asignacion";
+    const redirectTo = redirectMap[user!.rolName] ?? "/asignacion";
+    console.log(redirectTo);
 
     // Actualizar last_login
     // 8. Guardar token

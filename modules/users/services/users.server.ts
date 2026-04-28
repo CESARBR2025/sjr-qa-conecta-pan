@@ -34,3 +34,25 @@ export async function listarUsuariosPendientesAction(): Promise<UsersResponse> {
     };
   }
 }
+
+//Listar usuarios registrdos
+export async function listarUsuariosRegistradosAction(): Promise<UsersResponse> {
+  const service = new UsersService();
+  try {
+    const dataUsuario = await service.svListarUsuariosRegistrados();
+    return {
+      success: true,
+      data: dataUsuario,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      return { success: false, data: null, error: error.message };
+    }
+
+    return {
+      success: false,
+      data: null,
+      error: "Ocurrio error inesperado",
+    };
+  }
+}
