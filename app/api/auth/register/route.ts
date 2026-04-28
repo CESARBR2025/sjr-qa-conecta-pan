@@ -73,6 +73,22 @@ export async function POST(req: NextRequest) {
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24);
     console.log(expiresAt);
 
+    const roleIdCiudadano = await POOL_PG.query(
+      `
+  SELECT id
+  FROM roles
+  WHERE name = $1
+  LIMIT 1
+  `,
+      ["CIUDADANO"],
+    );
+
+    if (roleIdCiudadano.rows.length === 0) {
+      throw new Error(`No se encontró el rol: 'CIUDANO'`);
+    }
+
+    const role_id = roleIdCiudadano.rows[0].id;
+
     // 7. Crear usuario
     const newUser = await POOL_PG.query(
       `
@@ -98,19 +114,27 @@ export async function POST(req: NextRequest) {
     $3,
     $4,
     $5,
-    7,
+    $6,
     true,
     NOW(),
     NOW(),
     NOW(),
-    $6,
+    $7,
     'pending_verification',
     false,
     10
   )
   RETURNING id
   `,
-      [nombre, apellidoPaterno, apellidoMaterno, email, hashedPassword, curp],
+      [
+        nombre,
+        apellidoPaterno,
+        apellidoMaterno,
+        email,
+        hashedPassword,
+        role_id,
+        curp,
+      ],
     );
 
     const userId = newUser.rows[0].id;
