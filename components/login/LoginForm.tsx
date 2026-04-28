@@ -60,7 +60,6 @@ export default function LoginForm() {
 
       console.log(data.user)
       //Guardar el token en local storage
-      localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
 
       //Redireccionar segun rol

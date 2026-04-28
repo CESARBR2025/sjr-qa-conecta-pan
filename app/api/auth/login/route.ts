@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { generarJWT } from "@/lib/jwt";
 import { AuthErrors } from "@/lib/errors";
 import { buscarUsuarioCorreoAction } from "@/modules/login/services/login.server";
+import { POOL_PG } from "@/lib/db";
+import { cookies } from "next/headers";
 
 export async function POST(req: NextRequest) {
   console.log("entro");
@@ -52,12 +54,24 @@ export async function POST(req: NextRequest) {
 
     const redirectTo = redirectMap[user!.rolId] ?? "/asignacion";
 
+    // Actualizar last_login
+    // 8. Guardar token
+    await POOL_PG.query(
+      `
+          UPDATE users
+            SET
+              last_login = NOW()
+          WHERE curp = $1
+            
+          `,
+      [user.curp],
+    );
+
     // 6. Response OK
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         ok: true,
-        token,
         redirectTo,
         user: {
           email: user.email,
@@ -69,6 +83,17 @@ export async function POST(req: NextRequest) {
       },
       { status: 200 },
     );
+
+    //Concatenar el token a las cookies
+    response.cookies.set("accessToken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24, // 24h
+    });
+
+    return response;
   } catch (error: unknown) {
     console.error("🔥 LOGIN ERROR COMPLETO:", error);
     // ─── ERRORES CONTROLADOS ─────────────────────────────
