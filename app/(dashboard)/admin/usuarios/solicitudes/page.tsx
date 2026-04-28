@@ -4,7 +4,7 @@ import ButtonComponent from "@/components/ui/ButtonComponent";
 import Card from "@/components/ui/Card";
 import DataTable, { ColumnInterface } from "@/components/ui/DataTable";
 import AsignarRoleModal from "@/components/ui/AsignarRolModal";
-import { listarUsuariosRegistradosAction } from "@/modules/users/services/users.server";
+import { listarUsuariosPendientesAction, listarUsuariosRegistradosAction } from "@/modules/users/services/users.server";
 import { ViewUsersAsigarRol } from "@/modules/users/types/users.types";
 import { ListFilterPlus } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -112,7 +112,7 @@ export default function NuevasSolicitudesUsuarios() {
   const loadUsers = async () => {
     setLoading(true);
 
-    const res = await listarUsuariosRegistradosAction();
+    const res = await listarUsuariosPendientesAction();
 
     if (res.success) {
       setData(res.data ?? []);
