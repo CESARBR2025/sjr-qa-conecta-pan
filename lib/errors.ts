@@ -47,7 +47,7 @@ export const AuthErrors = {
   ),
 
   INVALID_CREDENTIALS: createError(
-    "La CURP o la contraseña no son correctas",
+    "El correo o la contraseña no son correctas",
     "INVALID_CREDENTIALS",
     401,
   ),

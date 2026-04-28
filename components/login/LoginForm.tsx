@@ -84,9 +84,11 @@ export default function LoginForm() {
 
           {/* LEFT */}
           <div className="flex items-center gap-2">
-            <Image src="/whats.svg" alt="Logo PAN" width={40} height={40}
-              className="w-[24px] h-[24px] sm:w-[36px] sm:h-[36px] lg:w-[30px] lg:h-[30px]" />
-            <p className="text-[12px] sm:text-[14px] lg:text-[18px] font-bold">Conecta PAN</p>
+            <img
+              src="/conecta-pan-logo-f2.png"
+              alt="Logo Conecta PAN"
+              className="h-7 w-auto object-contain"
+            />
           </div>
 
           {/* DIVIDER */}

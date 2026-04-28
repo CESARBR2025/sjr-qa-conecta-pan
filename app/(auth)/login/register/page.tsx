@@ -85,9 +85,9 @@ export default function RegisterForm() {
                 </button>
 
                 <img
-                    src="/conecta-pan-logo.png"
+                    src="/conecta-pan-logo-f2.png"
                     alt="Logo Conecta PAN"
-                    className="h-4 w-auto object-contain"
+                    className="h-7 w-auto object-contain"
                 />
             </div>
 

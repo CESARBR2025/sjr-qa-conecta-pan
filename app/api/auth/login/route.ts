@@ -4,6 +4,7 @@ import { AuthErrors } from "@/lib/errors";
 import { buscarUsuarioCorreoAction } from "@/modules/login/services/login.server";
 import { POOL_PG } from "@/lib/db";
 import { cookies } from "next/headers";
+import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
   console.log("entro");
@@ -25,6 +26,18 @@ export async function POST(req: NextRequest) {
     }
 
     let user = dataUser.data;
+
+    /**
+     * IMPORTANTE:
+     * user.password_hash debe venir desde la query
+     */
+
+    // 3. Validar password con hash
+    const passwordValido = await bcrypt.compare(password, user.password_hash);
+
+    if (!passwordValido) {
+      throw AuthErrors.INVALID_CREDENTIALS;
+    }
 
     // 3. Validar estructura de usuario
     if (!user.rolId || !user.permissions) {
