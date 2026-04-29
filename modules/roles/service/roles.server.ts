@@ -228,3 +228,42 @@ export async function listarTodosLosPermisosAction(): Promise<
     return [];
   }
 }
+
+//! Crear nuevo rol action
+export async function crearNuevoRolAction(
+  roleCode: string,
+  description: string,
+): Promise<RepositoryResponseActualizarPermisos> {
+  try {
+    const service = new RolesService();
+    //? Validacion rapida de entrada
+    if (!roleCode?.trim()) {
+      return {
+        success: false,
+        message: "El nombre del rol es obligatorio",
+      };
+    }
+
+    if (!description?.trim()) {
+      return {
+        success: false,
+        message: "La descripción del rol es obligatoria",
+      };
+    }
+
+    //? LLamada al service
+    const response = await service.svCrearNuevoRol(roleCode, description);
+
+    return response;
+  } catch (error) {
+    console.log(error);
+
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Error inesperado al crear el rol",
+    };
+  }
+}

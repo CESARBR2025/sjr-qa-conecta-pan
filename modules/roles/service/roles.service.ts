@@ -55,13 +55,6 @@ export class RolesService {
         };
       }
 
-      if (!permissions || permissions.length === 0) {
-        return {
-          success: false,
-          message: `Debes seleccionar al menos un permiso para ${roleCode}`,
-        };
-      }
-
       //? Llamada al repositorio
       await this.repo.actualizarPermisosRolRP(roleCode, permissions);
 
@@ -93,6 +86,50 @@ export class RolesService {
     } catch (error) {
       console.log(error);
       throw error;
+    }
+  }
+
+  //! Crear nuevo rol
+  async svCrearNuevoRol(
+    roleCode: string,
+    description: string,
+  ): Promise<RepositoryResponseActualizarPermisos> {
+    try {
+      //? Validaciones de negocio
+      if (!roleCode?.trim()) {
+        return {
+          success: false,
+          message: "El nombre del rol es obligatorio",
+        };
+      }
+
+      if (!description?.trim()) {
+        return {
+          success: false,
+          message: "La descripción del rol es obligatoria",
+        };
+      }
+
+      //? Normalizacion
+      const normalizedRoleCode = roleCode.trim().toUpperCase();
+
+      //? Peticion a repo
+      await this.repo.crearNuevoRolRP(normalizedRoleCode, description.trim());
+
+      return {
+        success: true,
+        message: `Rol ${normalizedRoleCode} creado correctamente`,
+      };
+    } catch (error) {
+      console.log(error);
+
+      return {
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Error inesperado al crear el nuevo rol",
+      };
     }
   }
 }

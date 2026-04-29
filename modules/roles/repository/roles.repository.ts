@@ -1,4 +1,5 @@
 import {
+  DBNuevoRol,
   DBPermissionsTable,
   DBRolesPermisos,
   DBRolesTable,
@@ -39,13 +40,13 @@ RETURNING
   u.updated_at;`,
 
   GROUP_ROLES_PERMISOS: `
-  SELECT 
+SELECT 
   r.name AS role,
   r.description,
   ARRAY_AGG(p.name ORDER BY p.name) AS permissions
 FROM roles r
-JOIN role_permissions rp ON r.id = rp.role_id
-JOIN permissions p ON rp.permission_id = p.id
+left JOIN role_permissions rp ON r.id = rp.role_id
+left JOIN permissions p ON rp.permission_id = p.id
 GROUP BY r.name, r.description 
 ORDER BY r.name;
 
@@ -80,6 +81,29 @@ SELECT
   description
 FROM permissions
 ORDER BY name;
+`,
+
+  //! Crear nuevo rol
+  // ============================================================
+  // SQL
+  // ============================================================
+
+  CREAR_NUEVO_ROL: `
+INSERT INTO roles (
+  name,
+  description,
+  created_at
+)
+VALUES (
+  UPPER($1),
+  $2,
+  NOW()
+)
+RETURNING
+  id,
+  name,
+  description,
+  created_at;
 `,
 } as const;
 
@@ -212,6 +236,23 @@ export class RolesRepository {
       );
 
       return res.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+  //! Crear nuevo rol
+  async crearNuevoRolRP(
+    roleCode: string,
+    description: string,
+  ): Promise<DBNuevoRol> {
+    try {
+      const res = await POOL_PG.query<DBNuevoRol>(SQL.CREAR_NUEVO_ROL, [
+        roleCode,
+        description,
+      ]);
+
+      return res.rows[0];
     } catch (error) {
       console.log(error);
       throw error;

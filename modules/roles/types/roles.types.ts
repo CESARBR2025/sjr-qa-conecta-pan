@@ -33,6 +33,13 @@ export interface DBPermissionsTable {
   description: string;
 }
 
+export interface DBNuevoRol {
+  id: number;
+  name: string;
+  description: string;
+  created_at: string;
+}
+
 // ════════════════════════════════════════════════════
 // TIPOS DE VISTA (LO QUE REGRESA EL MAPPER)
 // ════════════════════════════════════════════════════

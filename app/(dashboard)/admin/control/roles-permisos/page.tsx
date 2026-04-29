@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { listarRolesPermisosAction, listarTodosLosPermisosAction } from "@/modules/roles/service/roles.server";
 import { ViewRolesPermisos } from "@/modules/roles/types/roles.types";
 import { actualizarRolesPermisosAction } from "@/modules/roles/service/roles.server";
+import CustomToast from "@/components/ui/Toast";
+import CreateRoleModal from "@/components/roles/CreateRolModal";
 
 // Mapeo de permisos a iconos y categorías
 const PERMISSION_CATEGORIES: Record<string, { label: string; description: string; icon: React.ReactNode }> = {
@@ -44,13 +46,42 @@ function mergePermissions(
 }
 
 // Componente de Editor de Permisos
-function PermissionsEditor({ role, allPermissions }: {
+function PermissionsEditor({ role, allPermissions, onUpdateRolePermissions }: {
     role: ViewRolesPermisos;
     allPermissions: string[];
+    onUpdateRolePermissions: (
+        roleCode: string,
+        permissions: string[]
+    ) => void;
 }) {
     const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(["campaign"]));
     const [searchQuery, setSearchQuery] = useState("");
     const [saving, setSaving] = useState(false);
+
+    //Toast
+    const [toast, setToast] = useState<{
+        show: boolean;
+        message: string;
+        type: "success" | "error";
+    }>({
+        show: false,
+        message: "",
+        type: "success",
+    });
+
+
+
+    const showToast = (
+        message: string,
+        type: "success" | "error" = "success"
+    ) => {
+        setToast({
+            show: true,
+            message,
+            type,
+        });
+    };
+
 
 
 
@@ -136,6 +167,8 @@ function PermissionsEditor({ role, allPermissions }: {
     //Funcion para enviar los permisos nuevos
 
     const handleSavePermissions = async () => {
+
+
         try {
             setSaving(true)
             const payload = buildPermissionsPayload();
@@ -147,17 +180,44 @@ function PermissionsEditor({ role, allPermissions }: {
                 payload.permissions
             );
 
-            alert(response.message)
+            if (response.success) {
+
+                showToast(response.message, "success");
+
+                await onUpdateRolePermissions(
+                    payload.roleCode,
+                    payload.permissions
+                );
+            } else {
+                showToast(response.message, "error");
+            }
 
         } catch (error) {
             console.log(error);
-            alert("Ocurrió un error inesperado");
+            showToast(
+                "Ocurrió un error inesperado al guardar cambios",
+                "error"
+            );
         } finally {
             setSaving(false)
         }
     };
     return (
         <div>
+            {toast.show && (
+                <CustomToast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() =>
+                        setToast((prev) => ({
+                            ...prev,
+                            show: false,
+                        }))
+                    }
+                />
+            )}
+
+
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
                 <div>
@@ -304,17 +364,31 @@ function PermissionsEditor({ role, allPermissions }: {
     );
 }
 
+
+
+
+
 export default function ControlRolesPermisosPage() {
 
     const [data, setData] = useState<ViewRolesPermisos[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedRole, setSelectedRole] = useState<ViewRolesPermisos | null>(null);
     const [allPermissions, setAllPermissions] = useState<string[]>([]);
+    const [openCreateRoleModal, setOpenCreateRoleModal] = useState(false);
+
+    //Controlar cuantos roles se visualizan
+    const [showAllRoles, setShowAllRoles] = useState(false);
+
+    //Crear lista visible
+    const visibleRoles = showAllRoles
+        ? data
+        : data.slice(0, 3);
 
 
 
 
-    console.log(selectedRole)
+
+
 
     //Cargando roles 
     const loadRoles = async () => {
@@ -329,6 +403,7 @@ export default function ControlRolesPermisosPage() {
             }
         }
 
+
         const permissionsRes = await listarTodosLosPermisosAction();
 
         setAllPermissions(
@@ -338,6 +413,8 @@ export default function ControlRolesPermisosPage() {
         setLoading(false);
     };
 
+    console.log(data)
+
 
 
 
@@ -346,6 +423,31 @@ export default function ControlRolesPermisosPage() {
     }, []);
 
 
+    const handleLocalRoleUpdate = (
+        roleCode: string,
+        permissions: string[]
+    ) => {
+        setData((prev) =>
+            prev.map((role) =>
+                role.roleName === roleCode
+                    ? {
+                        ...role,
+                        permissions,
+                    }
+                    : role
+            )
+        );
+
+        setSelectedRole((prev) =>
+            prev?.roleName === roleCode
+                ? {
+                    ...prev,
+                    permissions,
+                }
+                : prev
+        );
+    };
+
 
     if (loading) {
         return <p>Cargando datos...</p>;
@@ -353,6 +455,9 @@ export default function ControlRolesPermisosPage() {
 
     return (
         <div className="w-full ">
+
+
+
 
             <h1 className="text-[30px] font-bold ">Roles  & Permisos</h1>
             <p className="text-[16px] text-gray-500 ">Administra el control de los permisos asignados a los roles</p>
@@ -365,6 +470,7 @@ export default function ControlRolesPermisosPage() {
                         <ButtonComponent
                             variant="ghostBlue"
                             icon={Plus}
+                            onClick={() => setOpenCreateRoleModal(true)}
                             //onClick={handleToggleSearch}
                             className="w-full sm:w-auto"
                         >
@@ -374,7 +480,7 @@ export default function ControlRolesPermisosPage() {
 
                     {/* Roles List */}
                     <div className="space-y-3">
-                        {data.map((role) => (
+                        {visibleRoles.map((role) => (
                             <button
                                 key={role.roleName}
                                 onClick={() => setSelectedRole(role)}
@@ -407,18 +513,33 @@ export default function ControlRolesPermisosPage() {
 
                     {/* Footer Link */}
                     <div className="mt-6 pt-4 border-t border-gray-200">
-                        <a
-                            href="#"
-                            className="text-blue-500 text-sm font-medium flex items-center gap-1 hover:text-blue-700 transition-colors"
-                        >
-                            Ver todos los roles
-                            <ChevronRight className="w-4 h-4" />
-                        </a>
+                        {data.length > 3 && (
+                            <button
+                                onClick={() =>
+                                    setShowAllRoles(!showAllRoles)
+                                }
+                                className="text-blue-500 text-sm font-medium flex items-center gap-1 hover:text-blue-700 transition-colors"
+                            >
+                                {showAllRoles
+                                    ? "Ver menos"
+                                    : "Ver todos los roles"}
+
+                                <ChevronRight
+                                    className={`w-4 h-4 transition-transform ${showAllRoles
+                                        ? "rotate-90"
+                                        : ""
+                                        }`}
+                                />
+                            </button>
+                        )}
                     </div>
                 </Card>
                 <Card className="w-4/6">
                     {selectedRole ? (
-                        <PermissionsEditor role={selectedRole} allPermissions={allPermissions} />
+                        <PermissionsEditor
+                            role={selectedRole}
+                            allPermissions={allPermissions}
+                            onUpdateRolePermissions={handleLocalRoleUpdate} />
                     ) : (
                         <div className="flex items-center justify-center h-96">
                             <p className="text-gray-500">Selecciona un rol para ver sus permisos</p>
@@ -429,6 +550,7 @@ export default function ControlRolesPermisosPage() {
 
             </div>
 
+            <CreateRoleModal open={openCreateRoleModal} onClose={() => setOpenCreateRoleModal(false)} onSuccess={loadRoles} />
 
         </div>
     );
