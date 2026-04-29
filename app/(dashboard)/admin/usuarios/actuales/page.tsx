@@ -183,66 +183,66 @@ export default function UsuariosRegistradosPage() {
             </p>
 
             <Card className="mt-6">
-                {/* HEADER */}
-                <div className="flex flex-col gap-4 mb-6 md:flex-row md:items-center md:justify-between">
-                    {/* TITLES */}
-                    <div className="w-full">
-                        <div className="flex justify-between">
-                            <div className="flex gap-4">
-                                <div className="p-3 bg-[#EAF0FD] rounded-full justify-center items-center flex ">
-                                    <Users2 className="h-5.5 y-5.5 text-[#2E72EA] pointer-events-none  flex-1/10" strokeWidth={2} /></div>
-
-                                <div className="flex flex-col">
-                                    <h1 className="text-lg font-bold">Usuarios registrados</h1>
-                                    <p className="text-gray-400 font-semibold">Gestiona los roles asignados a los usuarios</p>
-                                </div>
-                            </div>
-                            <div className="flex  justify-between gap-4 ">
-
-                                <div className="flex justify-self-end items-center   w-md  rounded-xl  border border-[#E4E8EF]  ">
-
-                                    <Search className="h-4 y-4 text-gray-400 pointer-events-none  flex-1/10" />
-
-                                    <input
-                                        type="text"
-                                        placeholder="Buscar por CURP o Nombre"
-                                        value={search}
-                                        onChange={(e) => setSearch(e.target.value)}
-                                        className="
-                                            flex-9/10
-                                            
-                                            text-sm
-                                            outline-none
-                                            focus:border-[#1F69E7]
-                                            focus:bg-white
-                                            transition
-                                        "
-                                    />
-                                </div>
 
 
 
+                {/* HEADER TOP */}
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-8">
 
-                                <ButtonComponent
-                                    variant="ghost"
-                                    icon={ChartNoAxesCombined}
-                                    onClick={handleToggleSearch}
-                                    className="w-full sm:w-auto text-gray-500"
-                                >
-                                    {showSearch ? "Mostrar KPIs" : "Ocultar KPIS"}
-                                </ButtonComponent>
+                    {/* TITLE */}
+                    <div className="flex items-start gap-3">
 
+                        <div className="p-3 bg-[#EAF0FD] rounded-full flex items-center justify-center">
+                            <Users2 className="h-5 w-5 text-[#2E72EA]" strokeWidth={2} />
+                        </div>
 
-
-
-                            </div>
-
+                        <div className="flex flex-col">
+                            <h1 className="text-xl font-bold">
+                                Usuarios registrados
+                            </h1>
+                            <p className="text-sm text-gray-400 font-semibold">
+                                Gestiona los roles asignados a los usuarios
+                            </p>
                         </div>
 
                     </div>
 
+                    {/* ACTIONS */}
+                    <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+
+                        {/* SEARCH */}
+                        <div className="flex items-center gap-2 w-full lg:w-80 px-3 py-2 rounded-xl border border-[#E4E8EF]">
+
+                            <Search className="h-4 w-4 text-gray-400" />
+
+                            <input
+                                type="text"
+                                placeholder="Buscar por CURP o Nombre"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="
+                        w-full
+                        text-sm
+                        outline-none
+                    "
+                            />
+                        </div>
+
+                        {/* BUTTON */}
+                        <ButtonComponent
+                            variant="ghost"
+                            icon={ChartNoAxesCombined}
+                            onClick={handleToggleSearch}
+                            className="w-full sm:w-auto text-gray-500"
+                        >
+                            {showSearch ? "Ocultar KPIs" : "Mostrar KPIs"}
+                        </ButtonComponent>
+
+                    </div>
 
                 </div>
+
+
 
                 {/* MODAL */}
                 {verDetalles && userSelected && (
@@ -257,7 +257,7 @@ export default function UsuariosRegistradosPage() {
 
 
                 {showSearch && (
-                    <div className="w-full bg-[#F9FAFF] rounded-lg flex justify-around">
+                    <div className="w-full bg-[#F9FAFF] rounded-lg flex justify-around  grid grid-cols-1  md:grid-cols-2 lg:grid-cols-4">
                         <KPICard icon={Users2} value={kpis?.totalUsuarios} label="Usuarios totales" />
                         <KPICard icon={UserStar} value={kpis?.usuariosActivos} label="Usuarios activos" />
                         <KPICard icon={Shield} value={kpis?.rolesAsignados} label="Roles asignados " />
