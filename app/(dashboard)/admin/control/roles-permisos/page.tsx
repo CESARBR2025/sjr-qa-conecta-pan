@@ -452,7 +452,7 @@ export default function ControlRolesPermisosPage() {
                         <div className="space-y-3">
                             {visibleRoles.map((role) => (
                                 <div
-
+                                    key={role.roleName}
                                     onClick={() => handleSelectRole(role)}
                                     className={`w-full p-4 border rounded-lg transition-all cursor-pointer relative ${selectedRole?.roleName === role.roleName
                                         ? "border-blue-400 bg-blue-50"
