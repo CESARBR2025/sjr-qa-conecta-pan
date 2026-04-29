@@ -42,7 +42,6 @@ export interface DBUsersAsigarRol {
 // TIPOS DE VISTA (LO QUE REGRESA EL MAPPER)
 // ════════════════════════════════════════════════════
 export interface ViewUsersAsigarRol {
-  idCus: number;
   nombreUsuario: string;
   curp: string;
   estatus: string;

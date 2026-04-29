@@ -5,6 +5,7 @@ import {
   Calendar,
   UserPlus,
   UserRoundCheck,
+  UserKey,
 } from "lucide-react";
 
 export type UserRole = "ADMIN" | "OTRO" | "MESERO" | "COCINA";
@@ -31,7 +32,7 @@ export const menuByRole: Record<UserRole, any[]> = {
     {
       label: "Roles",
       href: "/admin/control/roles-permisos",
-      icon: House,
+      icon: UserKey,
       group: "Principal",
     },
     {

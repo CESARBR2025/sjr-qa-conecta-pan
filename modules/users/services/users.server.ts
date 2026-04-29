@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { ViewUsersAsigarRol } from "../types/users.types";
 import { UsersService } from "./users.service";
+import { UsersAsignarRolResponse } from "../mappers/users.mapper";
 
 type ActionReponse = { success: true } | { success: false; error: string };
 
@@ -11,6 +12,12 @@ type ActionReponse = { success: true } | { success: false; error: string };
 export type UsersResponse = {
   success: boolean;
   data: ViewUsersAsigarRol[] | null;
+  error?: string;
+};
+
+export type UsersDashboardResponse = {
+  success: boolean;
+  data: UsersAsignarRolResponse | null;
   error?: string;
 };
 
@@ -36,7 +43,7 @@ export async function listarUsuariosPendientesAction(): Promise<UsersResponse> {
 }
 
 //Listar usuarios registrdos
-export async function listarUsuariosRegistradosAction(): Promise<UsersResponse> {
+export async function listarUsuariosRegistradosAction(): Promise<UsersDashboardResponse> {
   const service = new UsersService();
   try {
     const dataUsuario = await service.svListarUsuariosRegistrados();

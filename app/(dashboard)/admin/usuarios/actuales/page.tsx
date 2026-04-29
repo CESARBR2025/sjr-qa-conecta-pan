@@ -4,93 +4,40 @@ import ButtonComponent from "@/components/ui/ButtonComponent";
 import Card from "@/components/ui/Card";
 import DataTable, { ColumnInterface } from "@/components/ui/DataTable";
 import AsignarRoleModal from "@/components/ui/AsignarRolModal";
-import { listarUsuariosRegistradosAction } from "@/modules/users/services/users.server";
+import { listarUsuariosRegistradosAction, UsersDashboardResponse } from "@/modules/users/services/users.server";
 import { ViewUsersAsigarRol } from "@/modules/users/types/users.types";
-import { ListFilterPlus } from "lucide-react";
+import { Calendar, ChartNoAxesCombined, ListFilterPlus, LucideIcon, Search, Shield, Users2, UserStar } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
-/*
-//2. Enviar correo
-    // 10. Enviar correo
-    const text = `
-Hola ${user.nombreUsuario || "Usuario"},
 
-Te informamos que tu rol en la plataforma ha sido actualizado.
+interface KPICardProps {
+    icon: LucideIcon;
+    value: string | number | undefined;
+    label: string;
+    isLast?: boolean;
+    showBorder?: boolean
+}
 
-Nuevo rol asignado: ${user.nombreRol}
 
-A partir de este momento, tendrás acceso a las funcionalidades correspondientes a este rol dentro del sistema.
 
-Si tienes alguna duda o consideras que esto es un error, puedes contactar al equipo de administración.
 
-Saludos,
-Equipo de la plataforma
-`;
 
-    const html = `
-  <div style="font-family: Arial, sans-serif; padding: 24px; background-color: #FAFBFF; border-radius: 12px;">
+const formatDate = (date: string) => {
+    return new Intl.DateTimeFormat("es-MX", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    }).format(new Date(date));
+};
 
-    <h2 style="color: #1F69E7; margin-bottom: 16px;">
-      Actualización de rol en la plataforma
-    </h2>
-
-    <p>
-      Hola <strong>${user.nombreUsuario || "Usuario"}</strong>,
-    </p>
-
-    <p>
-      Te informamos que tu rol en la plataforma ha sido <strong>actualizado</strong>.
-    </p>
-
-    <div style="
-      margin: 20px 0;
-      padding: 16px;
-      background-color: #ffffff;
-      border: 1px solid #EAF1FC;
-      border-radius: 10px;
-    ">
-      <p style="margin: 0; font-size: 14px; color: #666;">
-        Nuevo rol asignado:
-      </p>
-      <p style="margin: 6px 0 0 0; font-size: 18px; font-weight: 700; color: #1F69E7;">
-        ${user.nombreUsuario}
-      </p>
-    </div>
-
-    <p style="font-size: 14px; color: #333;">
-      A partir de este momento, tendrás acceso a las funcionalidades correspondientes a este rol dentro del sistema.
-    </p>
-
-    <p style="font-size: 14px; color: #333;">
-      Si no reconoces este cambio o consideras que es un error, por favor contacta al equipo de administración.
-    </p>
-
-    <p style="margin-top: 24px; font-size: 14px; color: #666;">
-      Saludos,<br/>
-      Equipo de la plataforma
-    </p>
-
-  </div>
-`;
-
-    sendMail({
-      to: user.email,
-      subject: "Nueva solicitud de usuario",
-      text,
-      html,
-    }).catch((err) => {
-      console.error("ERROR EMAIL ADMIN:", err);
-    });
-
-*/
 
 export default function UsuariosRegistradosPage() {
     const [verDetalles, setVerDetalles] = useState(false);
-    const [data, setData] = useState<ViewUsersAsigarRol[]>([]);
+    const [data, setData] = useState<UsersDashboardResponse | undefined>();
     const [loading, setLoading] = useState(true);
     const [userSelected, setUserSelected] = useState<ViewUsersAsigarRol>()
 
-    const [showSearch, setShowSearch] = useState(false);
+    const [showSearch, setShowSearch] = useState(true);
     const [search, setSearch] = useState("");
 
     // Obtener datos de registro seleccionado
@@ -108,17 +55,23 @@ export default function UsuariosRegistradosPage() {
     };
 
 
+
+
     //Cargando users 
     const loadUsers = async () => {
         setLoading(true);
 
-        const res = await listarUsuariosRegistradosAction();
+        try {
+            const response = await listarUsuariosRegistradosAction();
 
-        if (res.success) {
-            setData(res.data ?? []);
+            console.log(response);
+
+            if (response.success) {
+                setData(response); // ✔ correcto si guardas el response completo
+            }
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
 
     useEffect(() => {
@@ -126,15 +79,20 @@ export default function UsuariosRegistradosPage() {
     }, []);
 
     console.log(data)
+    const usuarios = data?.data?.usuarios
+    console.log(usuarios)
+    const kpis = data?.data?.resumen
+    console.log(kpis)
 
     /**
      * IMPORTANTE:
      * hooks siempre arriba, antes de cualquier return
      */
+
     const filteredData = useMemo(() => {
         const searchValue = search.toLowerCase().trim();
 
-        return data.filter((row) => {
+        return usuarios?.filter((row) => {
             if (!searchValue) return true;
 
             return (
@@ -143,6 +101,9 @@ export default function UsuariosRegistradosPage() {
             );
         });
     }, [data, search]);
+
+    console.log(filteredData)
+
 
     const columns: ColumnInterface[] = [
         {
@@ -172,7 +133,7 @@ export default function UsuariosRegistradosPage() {
         {
             key: "nombreRol",
             label: "Rol",
-            type: "text",
+            type: "role",
             showOnMobile: false
         },
         {
@@ -195,34 +156,92 @@ export default function UsuariosRegistradosPage() {
     if (loading) {
         return <p>Cargando datos...</p>;
     }
+    const KPICard = ({ icon: Icon, value, label, isLast = false }: KPICardProps) => (
+        <div className={`flex items-center gap-4 p-6 flex-1 relative ${!isLast ? 'pr-6' : ''}`}>
+            <div className="p-3 bg-[#EAF0FD] rounded-full flex justify-center items-center">
+                <Icon className="h-5 w-5 text-[#2E72EA]" strokeWidth={2} />
+            </div>
+            <div className="flex flex-col">
+                <h1 className="text-lg font-bold">{value}</h1>
+                <p className="text-gray-600 font-semibold">{label}</p>
+            </div>
+            {!isLast && (
+                <div className="absolute right-0 h-1/2 w-px bg-gray-200"></div>
+            )}
+        </div>
+    );
 
     return (
         <div className="w-full">
-            <Card>
+
+            <h1 className="text-[30px] font-bold text-[#1A2340]">
+                Gestión de usuarios
+            </h1>
+
+            <p className="text-[16px] text-gray-400 font-semibold leading-relaxed">
+                Administra usuarios, roles y permisos para controlar el acceso y las acciones dentro del sistema.
+            </p>
+
+            <Card className="mt-6">
                 {/* HEADER */}
                 <div className="flex flex-col gap-4 mb-6 md:flex-row md:items-center md:justify-between">
                     {/* TITLES */}
                     <div className="w-full">
-                        <h2 className="text-lg sm:text-xl font-semibold mb-2">
-                            Usuarios registrados
-                        </h2>
+                        <div className="flex justify-between">
+                            <div className="flex gap-4">
+                                <div className="p-3 bg-[#EAF0FD] rounded-full justify-center items-center flex ">
+                                    <Users2 className="h-5.5 y-5.5 text-[#2E72EA] pointer-events-none  flex-1/10" strokeWidth={2} /></div>
 
-                        <p className="text-sm sm:text-base text-gray-600">
-                            Gestiona los roles asignados a los usuarios
-                        </p>
+                                <div className="flex flex-col">
+                                    <h1 className="text-lg font-bold">Usuarios registrados</h1>
+                                    <p className="text-gray-400 font-semibold">Gestiona los roles asignados a los usuarios</p>
+                                </div>
+                            </div>
+                            <div className="flex  justify-between gap-4 ">
+
+                                <div className="flex justify-self-end items-center   w-md  rounded-xl  border border-[#E4E8EF]  ">
+
+                                    <Search className="h-4 y-4 text-gray-400 pointer-events-none  flex-1/10" />
+
+                                    <input
+                                        type="text"
+                                        placeholder="Buscar por CURP o Nombre"
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        className="
+                                            flex-9/10
+                                            
+                                            text-sm
+                                            outline-none
+                                            focus:border-[#1F69E7]
+                                            focus:bg-white
+                                            transition
+                                        "
+                                    />
+                                </div>
+
+
+
+
+                                <ButtonComponent
+                                    variant="ghost"
+                                    icon={ChartNoAxesCombined}
+                                    onClick={handleToggleSearch}
+                                    className="w-full sm:w-auto text-gray-500"
+                                >
+                                    {showSearch ? "Mostrar KPIs" : "Ocultar KPIS"}
+                                </ButtonComponent>
+
+
+
+
+                            </div>
+
+                        </div>
+
                     </div>
 
-                    {/* ACTIONS */}
-                    <div className="w-full md:w-auto flex justify-start md:justify-end">
-                        <ButtonComponent
-                            variant="ghost"
-                            icon={ListFilterPlus}
-                            onClick={handleToggleSearch}
-                            className="w-full sm:w-auto"
-                        >
-                            Buscar
-                        </ButtonComponent>
-                    </div>
+
                 </div>
 
                 {/* MODAL */}
@@ -235,37 +254,30 @@ export default function UsuariosRegistradosPage() {
                     />
                 )}
 
-                {/* SEARCH BOX */}
+
+
                 {showSearch && (
-                    <div className="mb-6 bg-white border border-[#EAF1FC] rounded-2xl p-4 sm:p-5 shadow-[0px_4px_18px_rgba(31,105,231,0.05)]">
-                        <input
-                            type="text"
-                            placeholder="Buscar por CURP o Nombre"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="
-                            w-full
-                            rounded-xl
-                            border border-[#E4E8EF]
-                            bg-[#F8FAFC]
-                            px-4 py-3
-                            text-sm
-                            outline-none
-                            focus:border-[#1F69E7]
-                            focus:bg-white
-                            transition
-                        "
-                        />
+                    <div className="w-full bg-[#F9FAFF] rounded-lg flex justify-around">
+                        <KPICard icon={Users2} value={kpis?.totalUsuarios} label="Usuarios totales" />
+                        <KPICard icon={UserStar} value={kpis?.usuariosActivos} label="Usuarios activos" />
+                        <KPICard icon={Shield} value={kpis?.rolesAsignados} label="Roles asignados " />
+                        <KPICard icon={Calendar} value={kpis?.ultimoAcceso ? formatDate(kpis.ultimoAcceso) : "-"} label="Ultimo acceso reciente " showBorder={false} />
+
                     </div>
                 )}
 
+
+
+
                 {/* TABLE WRAPPER RESPONSIVE */}
-                <div className="w-full overflow-x-auto">
+                <div className="w-full overflow-x-auto mt-8">
+
                     <DataTable
                         columns={columns}
-                        data={filteredData}
+                        data={filteredData ?? []}
                         onRowSelected={handleRowClick}
                     />
+
                 </div>
             </Card>
         </div>

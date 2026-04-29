@@ -5,7 +5,7 @@ import { ReactNode } from "react";
 export interface ColumnInterface {
   key: string;
   label: string;
-  type?: "text" | "avatarName" | "status" | "actions" | "date";
+  type?: "text" | "avatarName" | "status" | "actions" | "date" | "role";
 
   render?: (value: any, row: any) => ReactNode;
 
@@ -192,6 +192,15 @@ function renderCell(column: ColumnInterface, row: any) {
           })}
         </div>
       );
+
+    case "role":
+      return (
+        <div className="p-1 bg-blue-50 flex items-center justify-center text-center rounded-lg">
+          <p className="text-blue-500 font-semibold ">{value}</p>
+        </div>
+      )
+
+
 
 
     default:

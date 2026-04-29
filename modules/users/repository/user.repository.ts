@@ -27,16 +27,47 @@ where u.estatus = 'pending_approval'
 
   LISTAR_USUARIOS_REGISTRADOS: `
    
-select
-	 concat_ws(' ', u.nombre , u.ap_paterno ) as nombre,
-	u.curp , u.estatus, u.last_login  as ultimo_acceso ,
-	r."name" as rol_name,
-  u.id as user_id,
-  u.email
-	
-from users u 
-join roles r on u.role_id  = r.id 
-where u.estatus = 'approval'
+
+WITH base_users AS (
+  SELECT 
+    u.id,
+    u.nombre,
+    u.ap_paterno,
+    u.curp,
+    u.estatus,
+    u.last_login,
+    u.email,
+    r.name AS rol_name
+  FROM users u
+  JOIN roles r ON u.role_id = r.id
+),
+
+kpis AS (
+  SELECT
+    COUNT(*) AS total_usuarios,
+    COUNT(*) FILTER (WHERE last_login >= NOW() - interval '7 days' ) AS usuarios_activos,
+    COUNT(DISTINCT rol_name) AS roles_asignados,
+    MAX(last_login) AS ultimo_acceso
+  FROM base_users
+)
+
+SELECT
+  (SELECT row_to_json(kpis) FROM kpis) AS resumen,
+
+  (
+    SELECT json_agg(
+      json_build_object(
+        'user_id', id,
+        'nombre', CONCAT(nombre, ' ', ap_paterno),
+        'curp', curp,
+        'estatus', estatus,
+        'rol_name', rol_name,
+        'email', email,
+        'ultimo_acceso', last_login
+      )
+    )
+    FROM base_users
+  ) AS usuarios;
   `,
 } as const;
 

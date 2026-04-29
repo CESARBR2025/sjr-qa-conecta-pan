@@ -1,4 +1,8 @@
-import { mapUsersAsignarRol } from "../mappers/users.mapper";
+import {
+  mapUsersAsignarRol,
+  mapUsersAsignarRolResponse,
+  UsersAsignarRolResponse,
+} from "../mappers/users.mapper";
 import { UsersRepository } from "../repository/user.repository";
 import { ViewUsersAsigarRol } from "../types/users.types";
 
@@ -12,9 +16,9 @@ export class UsersService {
     return rows.map(mapUsersAsignarRol);
   }
 
-  async svListarUsuariosRegistrados(): Promise<ViewUsersAsigarRol[]> {
+  async svListarUsuariosRegistrados(): Promise<UsersAsignarRolResponse> {
     const rows = await this.repo.listarUsuariosRegistradosRP();
-
-    return rows.map(mapUsersAsignarRol);
+    console.log(rows);
+    return mapUsersAsignarRolResponse(rows[0]);
   }
 }

@@ -10,77 +10,7 @@ import { ListFilterPlus } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 /*
-//2. Enviar correo
-    // 10. Enviar correo
-    const text = `
-Hola ${user.nombreUsuario || "Usuario"},
 
-Te informamos que tu rol en la plataforma ha sido actualizado.
-
-Nuevo rol asignado: ${user.nombreRol}
-
-A partir de este momento, tendrás acceso a las funcionalidades correspondientes a este rol dentro del sistema.
-
-Si tienes alguna duda o consideras que esto es un error, puedes contactar al equipo de administración.
-
-Saludos,
-Equipo de la plataforma
-`;
-
-    const html = `
-  <div style="font-family: Arial, sans-serif; padding: 24px; background-color: #FAFBFF; border-radius: 12px;">
-
-    <h2 style="color: #1F69E7; margin-bottom: 16px;">
-      Actualización de rol en la plataforma
-    </h2>
-
-    <p>
-      Hola <strong>${user.nombreUsuario || "Usuario"}</strong>,
-    </p>
-
-    <p>
-      Te informamos que tu rol en la plataforma ha sido <strong>actualizado</strong>.
-    </p>
-
-    <div style="
-      margin: 20px 0;
-      padding: 16px;
-      background-color: #ffffff;
-      border: 1px solid #EAF1FC;
-      border-radius: 10px;
-    ">
-      <p style="margin: 0; font-size: 14px; color: #666;">
-        Nuevo rol asignado:
-      </p>
-      <p style="margin: 6px 0 0 0; font-size: 18px; font-weight: 700; color: #1F69E7;">
-        ${user.nombreUsuario}
-      </p>
-    </div>
-
-    <p style="font-size: 14px; color: #333;">
-      A partir de este momento, tendrás acceso a las funcionalidades correspondientes a este rol dentro del sistema.
-    </p>
-
-    <p style="font-size: 14px; color: #333;">
-      Si no reconoces este cambio o consideras que es un error, por favor contacta al equipo de administración.
-    </p>
-
-    <p style="margin-top: 24px; font-size: 14px; color: #666;">
-      Saludos,<br/>
-      Equipo de la plataforma
-    </p>
-
-  </div>
-`;
-
-    sendMail({
-      to: user.email,
-      subject: "Nueva solicitud de usuario",
-      text,
-      html,
-    }).catch((err) => {
-      console.error("ERROR EMAIL ADMIN:", err);
-    });
 
 */
 
