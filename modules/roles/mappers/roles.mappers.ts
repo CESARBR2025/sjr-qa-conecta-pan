@@ -19,5 +19,6 @@ export function mapAgruparRolesPermisos(
     roleName: row.role,
     description: row.description,
     permissions: row.permissions,
+    allPermissions: row.allPermissions,
   };
 }

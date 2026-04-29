@@ -19,6 +19,7 @@ export interface DBRolesPermisos {
   role: string;
   description: string;
   permissions: string[];
+  allPermissions: string[];
 }
 
 export interface RepositoryResponseActualizarPermisos {
