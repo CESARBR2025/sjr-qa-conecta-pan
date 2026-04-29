@@ -21,6 +21,17 @@ export interface DBRolesPermisos {
   permissions: string[];
 }
 
+export interface RepositoryResponseActualizarPermisos {
+  success: boolean;
+  message: string;
+}
+
+export interface DBPermissionsTable {
+  id: number;
+  name: string;
+  description: string;
+}
+
 // ════════════════════════════════════════════════════
 // TIPOS DE VISTA (LO QUE REGRESA EL MAPPER)
 // ════════════════════════════════════════════════════
@@ -29,6 +40,7 @@ export interface ViewRolesPermisos {
   roleName: string;
   description: string;
   permissions: string[];
+  allPermissions: string[];
 }
 export interface ViewRolesTable {
   idRol: number;

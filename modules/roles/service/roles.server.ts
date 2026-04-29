@@ -1,7 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { ViewRolesPermisos, ViewRolesTable } from "../types/roles.types";
+import {
+  DBPermissionsTable,
+  RepositoryResponseActualizarPermisos,
+  ViewRolesPermisos,
+  ViewRolesTable,
+} from "../types/roles.types";
 import { RolesService } from "./roles.service";
 import { sendMail } from "@/lib/email/mailer";
 
@@ -170,5 +175,56 @@ export async function listarRolesPermisosAction(): Promise<RolesPermisosResponse
       data: null,
       error: "Ocurrio error inesperado",
     };
+  }
+}
+
+//! Asignar roles y permisos action
+export async function actualizarRolesPermisosAction(
+  roleCode: string,
+  permissions: string[],
+): Promise<RepositoryResponseActualizarPermisos> {
+  const service = new RolesService();
+
+  try {
+    // Validación rapida de entrada
+    if (!roleCode) {
+      return {
+        success: false,
+        message: "No se recibió el rol a actualizar",
+      };
+    }
+
+    //llamada al service
+    const response = await service.svActualizarRolesPermisos(
+      roleCode,
+      permissions,
+    );
+
+    return response;
+  } catch (error) {
+    console.log(error);
+
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Error inesperado al ejecutar la actualización de permisos",
+    };
+  }
+}
+
+//! Universo de permisos
+export async function listarTodosLosPermisosAction(): Promise<
+  DBPermissionsTable[]
+> {
+  const service = new RolesService();
+  try {
+    const response = await service.svListarTodosLosPermisos();
+
+    return response;
+  } catch (error) {
+    console.log(error);
+    return [];
   }
 }

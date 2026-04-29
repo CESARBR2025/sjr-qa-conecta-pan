@@ -3,7 +3,12 @@ import {
   mapUsersAsignarRol,
 } from "../mappers/roles.mappers";
 import { RolesRepository } from "../repository/roles.repository";
-import { ViewRolesPermisos, ViewRolesTable } from "../types/roles.types";
+import {
+  DBPermissionsTable,
+  RepositoryResponseActualizarPermisos,
+  ViewRolesPermisos,
+  ViewRolesTable,
+} from "../types/roles.types";
 
 export class RolesService {
   private repo = new RolesRepository();
@@ -33,5 +38,61 @@ export class RolesService {
     const rows = await this.repo.agruparRolesPermisosRP();
 
     return rows.map(mapAgruparRolesPermisos);
+  }
+
+  //! Cambiar permisos a roles
+
+  async svActualizarRolesPermisos(
+    roleCode: string,
+    permissions: string[],
+  ): Promise<RepositoryResponseActualizarPermisos> {
+    try {
+      //? Validación de negocio
+      if (!roleCode) {
+        return {
+          success: false,
+          message: "No se recibió el rol a actualizar",
+        };
+      }
+
+      if (!permissions || permissions.length === 0) {
+        return {
+          success: false,
+          message: `Debes seleccionar al menos un permiso para ${roleCode}`,
+        };
+      }
+
+      //? Llamada al repositorio
+      await this.repo.actualizarPermisosRolRP(roleCode, permissions);
+
+      //? Repuesta exitosa
+      return {
+        success: true,
+        message: `Permisos actualizados exitosamente para ${roleCode}`,
+      };
+    } catch (error) {
+      console.log(error);
+
+      //? Normalización de errores
+      return {
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : `Error inesperado al actualizar permisos de ${roleCode}`,
+      };
+    }
+  }
+
+  //! Universo de permisos
+  async svListarTodosLosPermisos(): Promise<DBPermissionsTable[]> {
+    try {
+      const response = await this.repo.listarTodosLosPermisosRP();
+
+      return response;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 }

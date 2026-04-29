@@ -1,6 +1,8 @@
 import {
+  DBPermissionsTable,
   DBRolesPermisos,
   DBRolesTable,
+  RepositoryResponseActualizarPermisos,
   ViewRolesTable,
 } from "../types/roles.types";
 
@@ -49,6 +51,36 @@ ORDER BY r.name;
 
 
   `,
+
+  //! Actualizar permisos
+
+  ACTUALIZAR_PERMISOS_GET_ROLE_ID: `
+SELECT id
+FROM roles
+WHERE name = $1
+LIMIT 1;
+`,
+
+  ACTUALIZAR_PERMISOS_GET_PERMISSION_IDS: `
+SELECT id, name
+FROM permissions
+WHERE name = ANY($1);
+`,
+
+  ACTUALIZAR_PERMISOS_DELETE_ROLE_PERMISSIONS: `
+DELETE FROM role_permissions
+WHERE role_id = $1;
+`,
+
+  //! Traer universo de permisos
+  UNIVERSO_PERMISOS: `
+SELECT
+  id,
+  name,
+  description
+FROM permissions
+ORDER BY name;
+`,
 } as const;
 
 // ============================================================
@@ -86,6 +118,100 @@ export class RolesRepository {
       const resp = await POOL_PG.query(SQL.GROUP_ROLES_PERMISOS);
       console.log(resp);
       return resp.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  //! 4 cosas para asignación nueva de permisos a roles
+
+  async actualizarPermisosRolRP(
+    roleCode: string,
+    permissions: string[],
+  ): Promise<void> {
+    const client = await POOL_PG.connect();
+
+    try {
+      await client.query("BEGIN");
+
+      //? 1. Buscar role_id usando roleCode
+
+      const roleResult = await client.query(
+        SQL.ACTUALIZAR_PERMISOS_GET_ROLE_ID,
+        [roleCode],
+      );
+
+      if (roleResult.rows.length === 0) {
+        throw new Error(`Rol no encontrado: ${roleCode}`);
+      }
+
+      const roleId = roleResult.rows[0].id;
+
+      //? 2.Buscar permission_id
+
+      const permissionResult = await client.query(
+        SQL.ACTUALIZAR_PERMISOS_GET_PERMISSION_IDS,
+        [permissions],
+      );
+
+      const permissionIds = permissionResult.rows.map((row) => row.id);
+      console.log(permissionIds);
+
+      //? Validación: Si faltan permisos -> error
+      if (permissionIds.length !== permissions.length) {
+        throw new Error(
+          "Uno o más permisos no existen en la tabla permissions",
+        );
+      }
+
+      //? 3. Eliminar permisos actuales del rol
+      await client.query(SQL.ACTUALIZAR_PERMISOS_DELETE_ROLE_PERMISSIONS, [
+        roleId,
+      ]);
+
+      //? 4. Insertar nuevos registros
+      if (permissionIds.length > 0) {
+        const values: string[] = [];
+        const params: any[] = [];
+
+        permissionIds.forEach((permissionId, index) => {
+          values.push(`($1, $${index + 2})`);
+          params.push(permissionId);
+        });
+
+        const insertQuery = `
+        INSERT INTO role_permissions (
+          role_id,
+          permission_id
+        )
+        VALUES ${values.join(", ")}
+      `;
+
+        await client.query(insertQuery, [roleId, ...params]);
+      }
+
+      await client.query("COMMIT");
+
+      return;
+    } catch (error) {
+      await client.query("ROLLBACK");
+      console.log(error);
+
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  //! Universo de permisos
+  async listarTodosLosPermisosRP(): Promise<DBPermissionsTable[]> {
+    try {
+      const res = await POOL_PG.query<DBPermissionsTable>(
+        SQL.UNIVERSO_PERMISOS,
+      );
+
+      return res.rows;
     } catch (error) {
       console.log(error);
       throw error;

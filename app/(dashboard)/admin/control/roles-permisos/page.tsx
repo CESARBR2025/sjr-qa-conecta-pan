@@ -2,51 +2,68 @@
 
 import ButtonComponent from "@/components/ui/ButtonComponent";
 import Card from "@/components/ui/Card";
-import DataTable, { ColumnInterface } from "@/components/ui/DataTable";
-import AsignarRoleModal from "@/components/ui/AsignarRolModal";
-import { listarUsuariosRegistradosAction } from "@/modules/users/services/users.server";
-import { ViewUsersAsigarRol } from "@/modules/users/types/users.types";
 import { ChevronRight, ListFilterPlus, Plus, Shield, Users, Zap, Search, ChevronDown, ChevronUp, Check, Mail, CircleCheckBig, Calendar, LogIn, Logs, MapIcon, ChartNoAxesColumn, ChartNoAxesCombined, Form, User } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { listarRolesPermisosAction } from "@/modules/roles/service/roles.server";
+import { useEffect, useState } from "react";
+import { listarRolesPermisosAction, listarTodosLosPermisosAction } from "@/modules/roles/service/roles.server";
 import { ViewRolesPermisos } from "@/modules/roles/types/roles.types";
+import { actualizarRolesPermisosAction } from "@/modules/roles/service/roles.server";
 
 // Mapeo de permisos a iconos y categorías
 const PERMISSION_CATEGORIES: Record<string, { label: string; description: string; icon: React.ReactNode }> = {
-    "affiliate": { label: "Afiliados", description: "Administra vista de afiliados", icon: <Users /> },
-    "campaign": { label: "Campaign", description: "Manage and view campaigns", icon: <Mail /> },
-    "checkin": { label: "Check-in", description: "Use check-in functionality", icon: <CircleCheckBig /> },
-    "event": { label: "Event", description: "Manage and view events", icon: <Calendar /> },
-    "log": { label: "Log", description: "View system logs", icon: <Logs /> },
-    "map": { label: "Map", description: "View maps", icon: <MapIcon /> },
-    "report": { label: "Report", description: "View reports", icon: <ChartNoAxesCombined /> },
-    "role": { label: "Role", description: "Manage roles", icon: <Shield /> },
-    "template": { label: "Template", description: "Manage and view templates", icon: <Form /> },
-    "user": { label: "User", description: "Manage users", icon: <User /> },
+    "affiliate": { label: "Control de afiliados", description: "Administra vista de afiliados", icon: <Users /> },
+    "campaign": { label: "Creación de campanias", description: "Controla permisos de campanias", icon: <Mail /> },
+    "checkin": { label: "Registro de asistencia", description: "Administra acceso a eventos", icon: <CircleCheckBig /> },
+    "event": { label: "Control de eventos", description: "Crea y visualiza eventos", icon: <Calendar /> },
+    "log": { label: "Log", description: "Visualiza logs del sistema", icon: <Logs /> },
+    "map": { label: "Mapa de afiliados", description: "Visualiza mapa de afiliados", icon: <MapIcon /> },
+    "report": { label: "Reportes & KPIs", description: "Visualiza reportes del sistema", icon: <ChartNoAxesCombined /> },
+    "role": { label: "Roles & Permisos", description: "Administra roles", icon: <Shield /> },
+    "template": { label: "Plantillas de mensaje", description: "Andministra plantillas de mensajes de campania", icon: <Form /> },
+    "user": { label: "Control de usuarios", description: "Administra usuarios", icon: <User /> },
 };
 
 // Función para agrupar permisos
-function groupPermissions(permissions: string[]) {
-    const grouped: Record<string, { view: boolean; manage: boolean }> = {};
+function mergePermissions(
+    allPermissions: string[],
+    activePermissions: string[]
+) {
+    const grouped: Record<string, Record<string, boolean>> = {};
 
-    permissions.forEach((permission) => {
+    allPermissions.forEach((permission) => {
         const [resource, action] = permission.split(":");
+
         if (!grouped[resource]) {
-            grouped[resource] = { view: false, manage: false };
+            grouped[resource] = {};
         }
-        if (action === "view") grouped[resource].view = true;
-        if (action === "manage") grouped[resource].manage = true;
-        if (action === "use") grouped[resource].manage = true; // checkin:use -> manage
+
+        grouped[resource][action] =
+            activePermissions.includes(permission);
     });
 
     return grouped;
 }
 
 // Componente de Editor de Permisos
-function PermissionsEditor({ role }: { role: ViewRolesPermisos }) {
+function PermissionsEditor({ role, allPermissions }: {
+    role: ViewRolesPermisos;
+    allPermissions: string[];
+}) {
     const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(["campaign"]));
     const [searchQuery, setSearchQuery] = useState("");
-    const groupedPermissions = groupPermissions(role.permissions);
+    const [saving, setSaving] = useState(false);
+
+
+
+    const [permissionsState, setPermissionsState] = useState<
+        Record<string, Record<string, boolean>>
+    >(mergePermissions(allPermissions, role.permissions));
+
+    //Sincronizar rol -> permisos
+    useEffect(() => {
+        setPermissionsState(mergePermissions(allPermissions, role.permissions));
+    }, [role, allPermissions]);
+
+
 
     const toggleCategory = (category: string) => {
         const newExpanded = new Set(expandedCategories);
@@ -58,18 +75,87 @@ function PermissionsEditor({ role }: { role: ViewRolesPermisos }) {
         setExpandedCategories(newExpanded);
     };
 
-    const expandAll = () => {
-        setExpandedCategories(new Set(Object.keys(groupedPermissions)));
+    //Funcion para controlar permisos (activar/desactivar)
+    const togglePermission = (
+        resource: string,
+        action: string
+    ) => {
+        setPermissionsState((prev) => ({
+            ...prev,
+            [resource]: {
+                ...prev[resource],
+                [action]: !prev[resource][action],
+            },
+        }));
     };
 
-    const filteredCategories = Object.entries(groupedPermissions).filter(([resource]) => {
+
+
+    const expandAll = () => {
+        setExpandedCategories(new Set(Object.keys(permissionsState)));
+    };
+
+    const filteredCategories = Object.entries(permissionsState).filter(([resource]) => {
         const category = PERMISSION_CATEGORIES[resource];
         return category?.label.toLowerCase().includes(searchQuery.toLowerCase());
     });
 
     const totalPermissions = role.permissions.length;
-    const enabledPermissions = totalPermissions;
+    const enabledPermissions = Object.values(permissionsState).reduce(
+        (acc, permission) =>
+            acc + (permission.view ? 1 : 0) + (permission.manage ? 1 : 0),
+        0
+    );
 
+
+
+    // Preparar payload para enviar
+    const buildPermissionsPayload = () => {
+        const permissions: string[] = [];
+
+        Object.entries(permissionsState).forEach(([resource, actions]) => {
+            Object.entries(actions).forEach(
+                ([action, enabled]) => {
+                    if (enabled) {
+                        permissions.push(
+                            `${resource}:${action}`
+                        );
+                    }
+                }
+            )
+
+        });
+
+        return {
+            roleCode: role.roleName,
+            permissions
+        }
+    };
+
+
+    //Funcion para enviar los permisos nuevos
+
+    const handleSavePermissions = async () => {
+        try {
+            setSaving(true)
+            const payload = buildPermissionsPayload();
+
+            console.log("Payload enviado:", payload);
+
+            const response = await actualizarRolesPermisosAction(
+                payload.roleCode,
+                payload.permissions
+            );
+
+            alert(response.message)
+
+        } catch (error) {
+            console.log(error);
+            alert("Ocurrió un error inesperado");
+        } finally {
+            setSaving(false)
+        }
+    };
     return (
         <div>
             {/* Header */}
@@ -78,10 +164,10 @@ function PermissionsEditor({ role }: { role: ViewRolesPermisos }) {
                     <div className="flex items-center gap-2 mb-2">
                         <Shield className="w-5 h-5 text-blue-500" />
                         <h3 className="text-lg font-bold text-gray-900">
-                            Editando rol:  <span className="text-blue-500">{role.roleName}</span>
+                            Editando permisos de:  <span className="text-blue-500">{role.roleName}</span>
                         </h3>
                     </div>
-                    <p className="text-sm text-gray-500">Configura los permisos para este rol</p>
+                    <p className="text-sm text-gray-500">Administra las acciones que puede desarrollar este rol</p>
                 </div>
 
                 <div className="bg-emerald-50 px-4 py-2 rounded-full border border-emerald-200">
@@ -90,6 +176,10 @@ function PermissionsEditor({ role }: { role: ViewRolesPermisos }) {
                     </p>
                 </div>
             </div>
+
+            <ButtonComponent onClick={() => handleSavePermissions()} disabled={saving} >
+                {saving ? "Guardando..." : "Guardar cambios"}
+            </ButtonComponent>
 
 
             <div className="flex justify-between">
@@ -123,7 +213,9 @@ function PermissionsEditor({ role }: { role: ViewRolesPermisos }) {
             {/* Categories */}
             <div className="space-y-3">
                 {filteredCategories.map(([resource, actions]) => {
+                    console.log(filteredCategories)
                     const category = PERMISSION_CATEGORIES[resource];
+                    console.log(category)
                     const isExpanded = expandedCategories.has(resource);
 
                     return (
@@ -155,41 +247,53 @@ function PermissionsEditor({ role }: { role: ViewRolesPermisos }) {
                             {/* Expandable Permissions */}
                             {isExpanded && (
                                 <div className="border-t border-[#EEF3FD] px-4 py-3 space-y-3 bg-white">
-                                    {actions.view && (
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <p className="font-medium text-gray-900">{resource}:view</p>
-                                                <p className="text-sm text-gray-500">View {resource.toLowerCase()}s</p>
-                                            </div>
-                                            <label className="relative inline-flex items-center cursor-pointer">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={true}
-                                                    onChange={() => { }}
-                                                    className="sr-only peer"
-                                                />
-                                                <div className="w-11 h-6 bg-blue-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-                                            </label>
-                                        </div>
-                                    )}
 
-                                    {actions.manage && (
-                                        <div className="flex items-center justify-between">
+                                    {Object.entries(actions).map(([action, enabled]) => (
+                                        <div
+                                            key={action}
+                                            className="flex items-center justify-between"
+                                        >
                                             <div>
-                                                <p className="font-medium text-gray-900">{resource}:manage</p>
-                                                <p className="text-sm text-gray-500">Create, edit and delete {resource.toLowerCase()}s</p>
+                                                <p className="font-medium text-gray-900">
+                                                    {resource}:{action}
+                                                </p>
+                                                <p className="text-sm text-gray-500">
+                                                    Permission for {resource}
+                                                </p>
                                             </div>
+
                                             <label className="relative inline-flex items-center cursor-pointer">
                                                 <input
                                                     type="checkbox"
-                                                    checked={true}
-                                                    onChange={() => { }}
+                                                    checked={enabled}
+                                                    onChange={() =>
+                                                        togglePermission(resource, action)
+                                                    }
                                                     className="sr-only peer"
                                                 />
-                                                <div className="w-11 h-6 bg-blue-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+
+                                                <div className="
+                w-11 h-6
+                bg-gray-200
+                rounded-full
+                transition-colors
+                peer-checked:bg-blue-600
+                peer-checked:after:translate-x-full
+                after:content-['']
+                after:absolute
+                after:top-[2px]
+                after:left-[2px]
+                after:bg-white
+                after:border
+                after:rounded-full
+                after:h-5
+                after:w-5
+                after:transition-all
+            " />
                                             </label>
                                         </div>
-                                    )}
+                                    ))}
+
                                 </div>
                             )}
                         </div>
@@ -205,6 +309,12 @@ export default function ControlRolesPermisosPage() {
     const [data, setData] = useState<ViewRolesPermisos[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedRole, setSelectedRole] = useState<ViewRolesPermisos | null>(null);
+    const [allPermissions, setAllPermissions] = useState<string[]>([]);
+
+
+
+
+    console.log(selectedRole)
 
     //Cargando roles 
     const loadRoles = async () => {
@@ -219,12 +329,23 @@ export default function ControlRolesPermisosPage() {
             }
         }
 
+        const permissionsRes = await listarTodosLosPermisosAction();
+
+        setAllPermissions(
+            permissionsRes.map((permission) => permission.name)
+        );
+
         setLoading(false);
     };
+
+
+
 
     useEffect(() => {
         loadRoles();
     }, []);
+
+
 
     if (loading) {
         return <p>Cargando datos...</p>;
@@ -297,7 +418,7 @@ export default function ControlRolesPermisosPage() {
                 </Card>
                 <Card className="w-4/6">
                     {selectedRole ? (
-                        <PermissionsEditor role={selectedRole} />
+                        <PermissionsEditor role={selectedRole} allPermissions={allPermissions} />
                     ) : (
                         <div className="flex items-center justify-center h-96">
                             <p className="text-gray-500">Selecciona un rol para ver sus permisos</p>
