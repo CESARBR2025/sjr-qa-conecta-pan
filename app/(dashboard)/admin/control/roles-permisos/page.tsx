@@ -2,9 +2,9 @@
 
 import ButtonComponent from "@/components/ui/ButtonComponent";
 import Card from "@/components/ui/Card";
-import { ChevronRight, ListFilterPlus, Plus, Shield, Users, Zap, Search, ChevronDown, ChevronUp, Check, Mail, CircleCheckBig, Calendar, LogIn, Logs, MapIcon, ChartNoAxesColumn, ChartNoAxesCombined, Form, User } from "lucide-react";
+import { ChevronRight, ListFilterPlus, Plus, Shield, Users, Zap, Search, ChevronDown, ChevronUp, Check, Mail, CircleCheckBig, Calendar, LogIn, Logs, MapIcon, ChartNoAxesColumn, ChartNoAxesCombined, Form, User, Trash2, CheckCheck, Save, SaveAll, AlertTriangle, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { listarRolesPermisosAction, listarTodosLosPermisosAction } from "@/modules/roles/service/roles.server";
+import { eliminarRolAction, listarRolesPermisosAction, listarTodosLosPermisosAction } from "@/modules/roles/service/roles.server";
 import { ViewRolesPermisos } from "@/modules/roles/types/roles.types";
 import { actualizarRolesPermisosAction } from "@/modules/roles/service/roles.server";
 import CustomToast from "@/components/ui/Toast";
@@ -237,7 +237,7 @@ function PermissionsEditor({ role, allPermissions, onUpdateRolePermissions }: {
                 </div>
             </div>
 
-            <ButtonComponent onClick={() => handleSavePermissions()} disabled={saving} >
+            <ButtonComponent onClick={() => handleSavePermissions()} disabled={saving} icon={Save} >
                 {saving ? "Guardando..." : "Guardar cambios"}
             </ButtonComponent>
 
@@ -366,7 +366,114 @@ function PermissionsEditor({ role, allPermissions, onUpdateRolePermissions }: {
 
 
 
+//Modal de confirmacion
+function DeleteRoleModal({
+    open,
+    role,
+    onCancel,
+    onConfirm,
+    loading,
+}: {
+    open: boolean;
+    role: ViewRolesPermisos | null;
+    onCancel: () => void;
+    onConfirm: () => void;
+    loading: boolean;
+}) {
+    if (!open || !role) return null;
 
+
+
+    return (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+            {/* Overlay click (opcional UX) */}
+            <div className="absolute inset-0" onClick={onCancel} />
+
+            <div
+                className="relative w-full max-w-md rounded-2xl border shadow-lg"
+                style={{
+                    background: "#FFFFFF",
+                    borderColor: "#EAF1FC",
+                    boxShadow: "0px 8px 30px rgba(31, 105, 231, 0.08)",
+                }}
+            >
+                {/* HEADER */}
+                <div className="flex items-start justify-between p-5 border-b"
+                    style={{ borderColor: "#EAF1FC" }}
+                >
+                    <div className="flex items-center gap-3">
+                        <div
+                            className="p-2 rounded-full"
+                            style={{
+                                background: "#FFF0F0",
+                                color: "#E55353",
+                            }}
+                        >
+                            <AlertTriangle size={18} />
+                        </div>
+
+                        <h2
+                            className="text-lg font-semibold"
+                            style={{ color: "#1A2340" }}
+                        >
+                            Eliminar rol
+                        </h2>
+                    </div>
+
+                    <button
+                        onClick={onCancel}
+                        className="p-2 rounded-lg hover:bg-[#EFF4FE] transition"
+                    >
+                        <X size={18} style={{ color: "#6B778C" }} />
+                    </button>
+                </div>
+
+                {/* BODY */}
+                <div className="p-5">
+                    <p className="text-sm leading-relaxed" style={{ color: "#6B778C" }}>
+                        ¿Seguro que deseas eliminar el rol{" "}
+                        <span className="font-semibold" style={{ color: "#1A2340" }}>
+                            {role.roleName}
+                        </span>
+                        ? Esta acción no se puede deshacer.
+                    </p>
+                </div>
+
+                {/* FOOTER */}
+                <div
+                    className="flex justify-end gap-3 p-5 border-t"
+                    style={{ borderColor: "#EAF1FC" }}
+                >
+                    <button
+                        onClick={onCancel}
+                        className="px-4 py-2 rounded-lg transition"
+                        style={{
+                            color: "#6B778C",
+                            background: "#FFFFFF",
+                            border: "1px solid #DDE3F0",
+                        }}
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        onClick={onConfirm}
+                        disabled={loading}
+                        className="px-4 py-2 rounded-lg flex items-center gap-2 transition"
+                        style={{
+                            background: "#E55353",
+                            color: "#FFFFFF",
+                        }}
+                    >
+                        <Trash2 size={16} />
+                        {loading ? "Eliminando..." : "Eliminar rol"}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 export default function ControlRolesPermisosPage() {
 
@@ -384,6 +491,81 @@ export default function ControlRolesPermisosPage() {
         ? data
         : data.slice(0, 3);
 
+    //Eliminar rol
+    const [roleToDelete, setRoleToDelete] =
+        useState<ViewRolesPermisos | null>(null);
+
+    const [showDeleteModal, setShowDeleteModal] =
+        useState(false);
+
+    const [deleting, setDeleting] = useState(false);
+
+    //Toast
+    const [toast, setToast] = useState<{
+        show: boolean;
+        message: string;
+        type: "success" | "error";
+    }>({
+        show: false,
+        message: "",
+        type: "success",
+    });
+
+
+    const showToast = (
+        message: string,
+        type: "success" | "error" = "success"
+    ) => {
+        setToast({
+            show: true,
+            message,
+            type,
+        });
+    };
+
+    const handleDeleteRole = async () => {
+        if (!roleToDelete) return;
+
+
+        try {
+            setDeleting(true);
+
+            const res = await eliminarRolAction(
+                roleToDelete.roleName
+            );
+
+            if (res.success) {
+                showToast(res.message, "success");
+
+                // 1. actualizar lista local
+                setData((prev) =>
+                    prev.filter(
+                        (r) =>
+                            r.roleName !==
+                            roleToDelete.roleName
+                    )
+                );
+
+                // 2. limpiar selección si era el seleccionado
+                if (
+                    selectedRole?.roleName ===
+                    roleToDelete.roleName
+                ) {
+                    setSelectedRole(null);
+                }
+
+                setShowDeleteModal(false);
+                setRoleToDelete(null);
+            } else {
+                showToast(res.message, "error");
+            }
+        } catch (error) {
+            console.log(error);
+            showToast("Error al eliminar rol", "error");
+        } finally {
+            setDeleting(false);
+        }
+    };
 
 
 
@@ -459,6 +641,10 @@ export default function ControlRolesPermisosPage() {
 
 
 
+
+
+
+
             <h1 className="text-[30px] font-bold ">Roles  & Permisos</h1>
             <p className="text-[16px] text-gray-500 ">Administra el control de los permisos asignados a los roles</p>
 
@@ -476,6 +662,8 @@ export default function ControlRolesPermisosPage() {
                         >
                             Nuevo rol
                         </ButtonComponent>
+
+
                     </div>
 
                     {/* Roles List */}
@@ -484,29 +672,55 @@ export default function ControlRolesPermisosPage() {
                             <button
                                 key={role.roleName}
                                 onClick={() => setSelectedRole(role)}
-                                className={`w-full p-4 border-1 rounded-lg transition-all cursor-pointer ${selectedRole?.roleName === role.roleName
+                                className={`w-full p-4 border rounded-lg transition-all cursor-pointer relative ${selectedRole?.roleName === role.roleName
                                     ? "border-blue-400 bg-blue-50"
                                     : "border-[#EEF3FD] bg-[#FDFDFD] hover:shadow-md"
                                     }`}
                             >
-                                {/* Icon & Title */}
-                                <div className="flex items-start gap-3">
-                                    <div className="mt-1">
-                                        {role.roleName === 'ADMIN' && (
-                                            <Shield className="w-6 h-6 text-blue-500" />
-                                        )}
-                                        {role.roleName === 'OPERATOR' && (
-                                            <Zap className="w-6 h-6 text-emerald-500" />
-                                        )}
-                                        {role.roleName === 'RECEPTIONIST' && (
-                                            <Users className="w-6 h-6 text-orange-500" />
-                                        )}
+                                <div className=" flex justify-between items-center">
+                                    {/* Main content */}
+                                    <div className="flex flex-9/10 items-start gap-3 ">
+                                        <div className="mt-1 ">
+                                            {role.roleName === "ADMIN" && (
+                                                <Shield className="w-6 h-6 text-blue-500" />
+                                            )}
+                                            {role.roleName === "OPERATOR" && (
+                                                <Zap className="w-6 h-6 text-emerald-500" />
+                                            )}
+                                            {role.roleName === "RECEPTIONIST" && (
+                                                <Users className="w-6 h-6 text-orange-500" />
+                                            )}
+                                        </div>
+
+                                        <div className="flex-1 text-left">
+                                            <h3 className="font-bold text-gray-900">
+                                                {role.roleName}
+                                            </h3>
+                                            <p className="text-sm text-gray-500">
+                                                {role.description}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className="flex-1 text-left">
-                                        <h3 className="font-bold text-gray-900">{role.roleName}</h3>
-                                        <p className="text-sm text-gray-500">{role.description}</p>
+
+
+                                    <div className="flex justify-center items-center  flex-1/10">
+                                        {/* Delete action */}
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setRoleToDelete(role);
+                                                setShowDeleteModal(true);
+                                            }}
+                                            className="flex p-2 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
                                     </div>
+
                                 </div>
+
+
+
                             </button>
                         ))}
                     </div>
@@ -551,7 +765,33 @@ export default function ControlRolesPermisosPage() {
             </div>
 
             <CreateRoleModal open={openCreateRoleModal} onClose={() => setOpenCreateRoleModal(false)} onSuccess={loadRoles} />
+            <DeleteRoleModal
+                open={showDeleteModal}
+                role={roleToDelete}
+                onCancel={() => {
+                    setShowDeleteModal(false);
+                    setRoleToDelete(null);
+                }}
+                onConfirm={handleDeleteRole}
+                loading={deleting}
+            />
+
+            {toast.show && (
+                <CustomToast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() =>
+                        setToast((prev) => ({
+                            ...prev,
+                            show: false,
+                        }))
+                    }
+                />
+            )}
+
 
         </div>
+
+
     );
 }

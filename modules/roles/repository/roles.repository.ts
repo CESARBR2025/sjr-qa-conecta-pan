@@ -3,6 +3,7 @@ import {
   DBPermissionsTable,
   DBRolesPermisos,
   DBRolesTable,
+  DBValidarUsuariosRol,
   RepositoryResponseActualizarPermisos,
   ViewRolesTable,
 } from "../types/roles.types";
@@ -84,9 +85,6 @@ ORDER BY name;
 `,
 
   //! Crear nuevo rol
-  // ============================================================
-  // SQL
-  // ============================================================
 
   CREAR_NUEVO_ROL: `
 INSERT INTO roles (
@@ -104,6 +102,32 @@ RETURNING
   name,
   description,
   created_at;
+`,
+
+  //! Eliminando rol
+  VALIDAR_USUARIOS_ASIGNADOS_ROL: `
+SELECT 
+  COUNT(*)::int AS total
+FROM users
+WHERE role_id = (
+  SELECT id
+  FROM roles
+  WHERE name = $1
+);
+`,
+
+  ELIMINAR_PERMISOS_ROL: `
+DELETE FROM role_permissions
+WHERE role_id = (
+  SELECT id
+  FROM roles
+  WHERE name = $1
+);
+`,
+
+  ELIMINAR_ROL: `
+DELETE FROM roles
+WHERE name = $1;
 `,
 } as const;
 
@@ -256,6 +280,49 @@ export class RolesRepository {
     } catch (error) {
       console.log(error);
       throw error;
+    }
+  }
+
+  //! Eliminar rol
+  async eliminarRolRP(roleCode: string): Promise<void> {
+    const client = await POOL_PG.connect();
+
+    try {
+      await client.query("BEGIN");
+
+      //? 1. ADMIN rol -> No se puede eliminar
+
+      if (roleCode.toUpperCase() === "ADMIN") {
+        throw new Error("El rol ADMIN no puede ser eliminado");
+      }
+
+      //? 2. Validar si tiene usuarios asignados al rol
+      const usersAssigned = await client.query<DBValidarUsuariosRol>(
+        SQL.VALIDAR_USUARIOS_ASIGNADOS_ROL,
+        [roleCode],
+      );
+
+      const totalUsers = usersAssigned.rows[0]?.total ?? 0;
+
+      if (totalUsers > 0) {
+        throw new Error(
+          `Este rol tiene ${totalUsers} usuario(s) asignado(s). Primero debes reasignarlos antes de eliminar el rol`,
+        );
+      }
+
+      //? 3.Eliminar permisos ligados primero
+      await client.query(SQL.ELIMINAR_PERMISOS_ROL, [roleCode]);
+
+      //? 4. Eliminar rol completamente
+      await client.query(SQL.ELIMINAR_ROL, [roleCode]);
+
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      console.log(error);
+      throw error;
+    } finally {
+      client.release();
     }
   }
 }

@@ -267,3 +267,34 @@ export async function crearNuevoRolAction(
     };
   }
 }
+
+//! Eliminar rol existente action
+
+export async function eliminarRolAction(
+  roleCode: string,
+): Promise<RepositoryResponseActualizarPermisos> {
+  const service = new RolesService();
+  try {
+    //? Validación rapida
+    if (!roleCode?.trim()) {
+      return {
+        success: false,
+        message: "El código del rol es obligatorio",
+      };
+    }
+
+    const response = await service.svEliminarRol(roleCode);
+
+    return response;
+  } catch (error) {
+    console.log(error);
+
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Error inesperado al eliminar el rol",
+    };
+  }
+}

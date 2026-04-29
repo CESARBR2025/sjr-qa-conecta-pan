@@ -40,6 +40,10 @@ export interface DBNuevoRol {
   created_at: string;
 }
 
+export interface DBValidarUsuariosRol {
+  total: number;
+}
+
 // ════════════════════════════════════════════════════
 // TIPOS DE VISTA (LO QUE REGRESA EL MAPPER)
 // ════════════════════════════════════════════════════

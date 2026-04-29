@@ -132,4 +132,41 @@ export class RolesService {
       };
     }
   }
+
+  //! Eliminar rol existente
+  async svEliminarRol(
+    roleCode: string,
+  ): Promise<RepositoryResponseActualizarPermisos> {
+    try {
+      //? Validación basica
+
+      if (!roleCode?.trim()) {
+        return {
+          success: false,
+          message: "El código del rol es obligatorio",
+        };
+      }
+
+      //? Normalización
+      const normalizedRoleCode = roleCode.trim().toUpperCase();
+
+      //? lLamada al repositorio
+      await this.repo.eliminarRolRP(normalizedRoleCode);
+
+      return {
+        success: true,
+        message: `Rol ${normalizedRoleCode} eliminado correctamente`,
+      };
+    } catch (error) {
+      console.log(error);
+
+      return {
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Error inesperado al eliminar el rol",
+      };
+    }
+  }
 }
